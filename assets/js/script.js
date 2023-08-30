@@ -12,7 +12,7 @@ const frown = new Emoji("sad", "placeholder", []);
 const smile = new Emoji("happy", "placeholder", []);
 const steam = new Emoji("angry", "placeholder", []);
 
-let startBtn = document.getElementById("startBtn");
+
 
 startBtn.addEventListener('click', ()=>{
     startBtn.style.display = "none";
