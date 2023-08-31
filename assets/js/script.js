@@ -1,9 +1,10 @@
 class Emoji{
     static instances = [];
-    constructor(emo, emoj, keywords){
+    constructor(emo, emote, keywords){
         this.emo = emo,
-        this.emoj = emoj;
+        this.emote = emote;
         this.keywords = keywords,
+        this.index = Emoji.instances.length;
         Emoji.instances.push(this)
     }
 }
@@ -23,6 +24,10 @@ const cowboy = new Emoji("cowboy", "🤠", ['old-timey', 'western', 'cowboy', 'w
 const nerd = new Emoji("nerdy", "🤓", ['smart', 'nerdy', 'intelligent', 'intellectual']);
 const tired = new Emoji("yawn", "🥱", ['tired', 'exhausted', 'sprung-out']);
 const inLove = new Emoji("loved", "💘", ['lovestruck', 'loving', 'careful', 'flamboyant']);
+// const test1 = new Emoji("loved", "💘", ['lovestruck', 'loving', 'careful', 'flamboyant']);
+// const test2 = new Emoji("loved", "💘", ['lovestruck', 'loving', 'careful', 'flamboyant']);
+// const test3 = new Emoji("loved", "💘", ['lovestruck', 'loving', 'careful', 'flamboyant']);
+
 
 
 
@@ -38,46 +43,71 @@ function renderEmojis(){
     let fullUl = document.createElement("ul");
 
     let n=0;
-    let rowList = [];
-    let rowUls = [];
+    let emojiRows = [];
+    let subUls = [];
     let emojiRowRem = Emoji.instances.length%5;
-    let emojiRowN = ((Emoji.instances.length-emojiRowRem)/5)+1
+    let emojiRowN = ()=>{
+        if (emojiRowRem>0){
+            return ((Emoji.instances.length-emojiRowRem)/5)+1;
+        } else {
+            return ((Emoji.instances.length-emojiRowRem)/5);
+        };
+    }
+
+    fullUl.setAttribute("class", "fullUl");
+    emojisContainer.setAttribute("class", "emoji-container");
+
     
     headerTitle.textContent = "How are you feeling?";
     emojiTitle.textContent = "Choose 3-7 emojis that best describe what mood you're in."
 
-    for (let i=0; i<emojiRowN; i++){
+    for (let i=0; i<emojiRowN(); i++){
         let li = document.createElement("li");
         let ul = document.createElement("ul");
-        li.setAttribute("class", "emoji-row");
-        rowList.push(li);
-        rowUls.push(ul);
+        ul.setAttribute("class", "emoji-row");
+        li.setAttribute("class", "emojiEl");
+        emojiRows.push(li);
+        subUls.push(ul);
     };
 
+    
     for (let i = 0; i < Emoji.instances.length; i++) {
         let li = document.createElement('li');
+        let p = document.createElement('p');
         li.setAttribute("class", "emojiBox");
-        li.textContent = Emoji.instances.emoj;
-        if (rowUls[n].childElementCount===5){
-            rowList[n].appendChild(rowUls[n]);
-            fullUl.appendChild(rowList[n])
+        p.setAttribute("class", "emojiImg");
+        p.textContent = Emoji.instances[i].emote;
+        if (subUls[n].childElementCount===5){
+            emojiRows[n].appendChild(subUls[n]);
+            fullUl.appendChild(emojiRows[n]);
             n++;
         }
-        rowUls[n].appendChild(li);
-        // li.addEventListener("click", , { one:true })
+        li.appendChild(p);
+        subUls[n].appendChild(li);
+        let x=n+1;
+        if (x===emojiRowN()&&i+1===Emoji.instances.length){
+            console.log("index: "+Emoji.instances[i].index)
+            emojiRows[n].appendChild(subUls[n]);
+            fullUl.appendChild(emojiRows[n]);
+        };
     };
-    // for (let i = 0; i < rowList.length; i++){
-    //     let ul = document.createElement("ul");
-    //     ul.appendChild(rowList[i]);
-    //     fullUl.appendChild(ul);
-    // }
+
     emojisContainer.appendChild(fullUl);
-    baseCard.appendChild(emojisContainer)
+    baseCard.appendChild(emojiTitle);
+    baseCard.appendChild(emojisContainer);
 }
 
 renderEmojis()
 
-
+// fetch("https://emojihub.yurace.pro/api/all")
+//     .then((response)=>{
+//         if (response.status===200){
+//             return response.json();
+//         }
+//     })
+//     .then((data)=>{
+//         console.log(data);
+//     })
 
 // let rtUrl = null;
 // let omdbUrl = "http://www.omdbapi.com/?apikey=1aa15ab1&t=gone+with+the+wind&plot=full";
