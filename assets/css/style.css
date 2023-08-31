@@ -171,6 +171,7 @@ h3{
 }
 
 .emoji-submit.on:hover{
+    cursor: pointer;
     box-shadow: 0 0 10px yellow;
 }
 
