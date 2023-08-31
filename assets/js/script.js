@@ -8,21 +8,21 @@ class Emoji{
     }
 }
 
-const crying = new Emoji("sad", "placeholder", [sad, depressed, unwell, anxious, hysterical]);
-const smile = new Emoji("happy", "placeholder", [happy, elated, good, fair]);
-const red = new Emoji("angry", "placeholder", [angry, mad, fuming, angered, pissed, infuriated]);
-const gasp = new Emoji("shocked", "placeholder", [shocked, spooked, nervous, scared]);
-const upsideDownSmiley = new Emoji("uneasy", "placeholder", [uneasy, nervous, restless, tense]);
-const loved = new Emoji("loving", "placeholder", [loving, affectionate, romantical, passionate]);
-const moneyTongue = new Emoji("moneyHungry", "placeholder", [greedy, eager, desirous, materialistic, moneygrubbing]);
-const hmm = new Emoji("thinking", "placeholder", [curious, interested, documentary, quizzical]);
-const sick = new Emoji("sick", "placeholder", [sick, unwell, ill]);
-const disgusted = new Emoji("disgust", "placeholder", [sick, unwell, ill, disgusted, unwell]);
-const queasy = new Emoji("queasy", "placeholder", [Queasy, squeamish, woozy, nauseous]);
-const cowboy = new Emoji("cowboy", "placeholder", [old-timey, western, cowboy, wildwest]);
-const nerd = new Emoji("nerdy", "placeholder", [smart, nerdy, intelligent, intellectual]);
-const tired = new Emoji("yawn", "placeholder", [tired, exhausted, sprung-out]);
-const inLove = new Emoji("loved", "placeholder", [Lovestruck, loving, careful, flamboyant]);
+const crying = new Emoji("sad", "😭", [sad, depressed, unwell, anxious, hysterical]);
+const smile = new Emoji("happy", "😀", [happy, elated, good, fair]);
+const red = new Emoji("angry", "😡", [angry, mad, fuming, angered, pissed, infuriated]);
+const gasp = new Emoji("shocked", "😯", [shocked, spooked, nervous, scared]);
+const upsideDownSmiley = new Emoji("uneasy", "🙃", [uneasy, nervous, restless, tense]);
+const loved = new Emoji("loving", "🥰", [loving, affectionate, romantical, passionate]);
+const moneyTongue = new Emoji("moneyHungry", "🤑", [greedy, eager, desirous, materialistic, moneygrubbing]);
+const hmm = new Emoji("thinking", "🤔", [curious, interested, documentary, quizzical]);
+const sick = new Emoji("sick", "🤒", [sick, unwell, ill]);
+const disgusted = new Emoji("disgust", "🤢", [sick, unwell, ill, disgusted, unwell]);
+const queasy = new Emoji("queasy", "🥴", [Queasy, squeamish, woozy, nauseous]);
+const cowboy = new Emoji("cowboy", "🤠", [old-timey, western, cowboy, wildwest]);
+const nerd = new Emoji("nerdy", "🤓", [smart, nerdy, intelligent, intellectual]);
+const tired = new Emoji("yawn", "🥱", [tired, exhausted, sprung-out]);
+const inLove = new Emoji("loved", "💘", [lovestruck, loving, careful, flamboyant]);
 
 
 
