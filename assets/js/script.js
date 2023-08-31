@@ -281,7 +281,7 @@ function renderInput(){
     
     userInput.setAttribute("maxLength", "500")
 
-    question.textContent = "What kind of movie are you into?"
+    question.textContent = "What kind of movies are you into?"
     charMax.textContent = userInput.value.trim().length+"/"+userInput.maxLength+" Characters"
 
     userForm.appendChild(question);
@@ -329,3 +329,13 @@ function renderInput(){
 //     .then((data)=>{
 //         console.log(data);
 //     })
+
+fetch("https://emojihub.yurace.pro/api/random/category/smileys-and-people")
+    .then((response)=>{
+        if (response.status===200){
+            return response.json();
+        }
+    })
+    .then((data)=>{
+        console.log(data);
+    })
