@@ -27,32 +27,47 @@ const inLove = new Emoji("loved", "placeholder", [Lovestruck, loving, careful, f
 
 
 
+let container = document.querySelector("#container");
+let containerHeader = document.querySelector("#container-header");
+let headerTitle = document.querySelector("#container-h2");
+let baseCard = document.querySelector("#base-card");
 
+function renderEmojis(){
+    let emojisContainer = document.createElement("div");
+    let emojiTitle = document.createElement("h3");
+    let fullUl = document.createElement("ul");
 
-startBtn.addEventListener('click', ()=>{
-    startBtn.style.display = "none";
-    appendEmojis();
-    }, { once:true });
-
-function appendEmojis(){
-    let emojiContainer = document.createElement("div");
-    let emojiList = document.createElement("ul");
-
-
-    emojiContainer.className = ("emoji-div");
-    document.body.appendChild(emojiContainer);
-    
-    // creates UL to hold the emoji lists
+    let n=0;
+    let rowList = [];
+    let emojiRowRem = Emoji.instances.length%5;
+    let emojiRowN = ((Emoji.instances.length-emojiRowRem)/5)+1
+    headerTitle.textContent = "How are you feeling?";
+    emojiTitle.textContent = "Choose 3-7 emojis that best describe what mood you're in."
     
     emojiContainer.appendChild(emojiList);
 
-    // var count = 1; //empty counter to add class names
-    //for loop to create list items and buttons 
-    for (i = 0; i < Emoji.instances.length; i++) {
-        let li = document.createElement('li'); // creates li(s)
-        let button = document.createElement('button'); // creates anchors within the list items
-        button.className = Emoji.instances[i].emo;
-        emojiList.appendChild(li); //appending to UL
-        li.appendChild(button); // appending to the newly created list items
+    for (let i=0; i<emojiRowN; i++){
+        let ul = document.createElement("ul");
+        ul.setAttribute("class", "emoji-row");
+        rowList.push(ul);
+    };
+
+    for (let i = 0; i < Emoji.instances.length; i++) {
+        let li = document.createElement('li');
     };
 }
+
+
+
+
+// let rtUrl = null;
+// let omdbUrl = "http://www.omdbapi.com/?apikey=1aa15ab1&t=gone+with+the+wind&plot=full";
+// fetch(omdbUrl)
+//     .then((response)=>{
+//         if (response.status===200){
+//             return response.json();
+//         }
+//     })
+//     .then((data)=>{
+//         console.log(data);
+//     })
