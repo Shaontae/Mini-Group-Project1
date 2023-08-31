@@ -41,10 +41,9 @@ function renderEmojis(){
     let rowList = [];
     let emojiRowRem = Emoji.instances.length%5;
     let emojiRowN = ((Emoji.instances.length-emojiRowRem)/5)+1
+    
     headerTitle.textContent = "How are you feeling?";
     emojiTitle.textContent = "Choose 3-7 emojis that best describe what mood you're in."
-    
-    emojiContainer.appendChild(emojiList);
 
     for (let i=0; i<emojiRowN; i++){
         let ul = document.createElement("ul");
@@ -54,7 +53,19 @@ function renderEmojis(){
 
     for (let i = 0; i < Emoji.instances.length; i++) {
         let li = document.createElement('li');
+        li.setAttribute("class", "emojiBox");
+        li.textContent = Emoji.instances.emoj;
+        if (rowList[n].childElementCount===5){
+            n++
+        }
+        rowList[n].appendChild(li);
+        // li.addEventListener("click", , { one:true })
     };
+    for (let i = 0; i < rowList.length; i++){
+        fullUl.appendChild(rowList[i]);
+    }
+    emojisContainer.appendChild(fullUl);
+    baseCard.appendChild(emojisContainer)
 }
 
 
