@@ -66,14 +66,14 @@ function renderEmojis(){
     fullUl.setAttribute("class", "fullUl");
     emojisContainer.setAttribute("class", "emoji-container");
 
-    button.textContent = "Next";
+    button.textContent = "NEXT";
     emojiRules.textContent = "Choose 3-7 Emojis"
     headerTitle.textContent = "How are you feeling?";
     emojiTitle.textContent = "Which emojis that best describe what mood you're in?"
 
     renderEmojiGrid();
     renderChoices()
-    buttonCheck();
+    
 
     emojisContainer.appendChild(fullUl);
     choiceBox.appendChild(choiceList);
@@ -82,8 +82,12 @@ function renderEmojis(){
     baseCard.appendChild(emojiRules);
     baseCard.appendChild(choiceBox);
     baseCard.appendChild(button);
+    
+    buttonCheck();
 
-    button.addEventListener("click", ()=>{
+    // button.addEventListener("click", buttonFn,{ once:true })
+
+    function buttonFn(){
         let gridList = document.getElementsByClassName("emojiGrid");
         let choiceSlots = document.getElementsByClassName("choiceSlot");
         for (let i=0; i<gridList.length; i++){
@@ -92,7 +96,7 @@ function renderEmojis(){
         for (let i=0; i<choiceSlots.length; i++){
             choiceSlots[i].removeEventListener("click", removeEmoji);
         }
-    },{ once:true })
+    }
 
 
     function renderEmojiGrid(){
@@ -148,10 +152,10 @@ function renderEmojis(){
     function buttonCheck(){
         if (chosenEmojis.length<3){
             button.setAttribute("class", "emoji-submit off");
-            // button.addEventListener("click", , { once:true });
+            button.removeEventListener("click", buttonFn);
         } else {
             button.setAttribute("class", "emoji-submit on");
-            // button.removeEventListener("click", , { once:true });
+            button.addEventListener("click", buttonFn, { once:true });
         }
     };
 
