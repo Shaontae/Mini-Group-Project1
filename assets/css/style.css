@@ -48,7 +48,7 @@ main{
    flex-grow: 1;
    /* max-width: 80%; */
    /* min-height: 100%; */
-   height: 80vh;
+   /* height: 80vh; */
 }
 
 .container-header{
@@ -112,15 +112,73 @@ h3{
     /* border: 1px dotted black; */
     min-height: 4rem;
     min-width: 4rem;
-    font-size: 3rem;
+    
 }
 
-.emojiImg:hover{
+.emojiImg{
+    font-size: 3rem;
+    -moz-user-select: none;
+    -khtml-user-select: none;
+    -webkit-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+
+.emojiImg.off{
+    filter: grayscale(100%);
+}
+
+.emojiImg.on:hover{
     cursor: pointer;
     text-shadow: 0 0 7px blue;
+    
 }
 
-.emojiImg:active{
+.emojiImg.on:active{
     cursor: pointer;
     text-shadow: none;
 }
+
+/* .emojiImg:focus{
+    background-color: transparent;
+} */
+
+.emoji-choice-box{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-width: 29rem;
+    min-height: 4.5rem;
+    border: 2px solid black;
+    margin-top: 1rem;
+    margin-bottom: 1rem;
+}
+
+.emoji-choice-list{
+    display: flex;
+    flex-direction: row;
+    /* gap: 1rem; */
+}
+
+.emoji-submit{
+    border: 2px outset black;
+    font-size: 1.5rem;
+    padding: 1rem 2rem;
+}
+
+.emoji-submit.on{
+    background-color: var(--color1);
+}
+
+.emoji-submit.on:hover{
+    box-shadow: 0 0 10px yellow;
+}
+
+.emoji-submit.on:active{
+    box-shadow: none;
+}
+
+.emoji-submit.off{
+    background-color: rgb(94, 93, 93);
+}
+
