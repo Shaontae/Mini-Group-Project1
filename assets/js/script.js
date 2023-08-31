@@ -36,6 +36,18 @@ const inLove = new Emoji("loved", "💘", ['lovestruck', 'loving', 'careful', 'f
 // const test10 = new Emoji("loved", "💘", ['lovestruck', 'loving', 'careful', 'flamboyant']);
 // const test11 = new Emoji("loved", "💘", ['lovestruck', 'loving', 'careful', 'flamboyant']);
 // const test12 = new Emoji("loved", "💘", ['lovestruck', 'loving', 'careful', 'flamboyant']);
+// const test13 = new Emoji("loved", "💘", ['lovestruck', 'loving', 'careful', 'flamboyant']);
+// const test14 = new Emoji("loved", "💘", ['lovestruck', 'loving', 'careful', 'flamboyant']);
+// const test15 = new Emoji("loved", "💘", ['lovestruck', 'loving', 'careful', 'flamboyant']);
+// const test16 = new Emoji("loved", "💘", ['lovestruck', 'loving', 'careful', 'flamboyant']);
+// const test17 = new Emoji("loved", "💘", ['lovestruck', 'loving', 'careful', 'flamboyant']);
+// const test18 = new Emoji("loved", "💘", ['lovestruck', 'loving', 'careful', 'flamboyant']);
+// const test19 = new Emoji("loved", "💘", ['lovestruck', 'loving', 'careful', 'flamboyant']);
+// const test20 = new Emoji("loved", "💘", ['lovestruck', 'loving', 'careful', 'flamboyant']);
+// const test21 = new Emoji("loved", "💘", ['lovestruck', 'loving', 'careful', 'flamboyant']);
+// const test22 = new Emoji("loved", "💘", ['lovestruck', 'loving', 'careful', 'flamboyant']);
+// const test23 = new Emoji("loved", "💘", ['lovestruck', 'loving', 'careful', 'flamboyant']);
+// const test24 = new Emoji("loved", "💘", ['lovestruck', 'loving', 'careful', 'flamboyant']);
 
 
 let chosenEmojis = [];
@@ -50,9 +62,9 @@ renderEmojis();
 
 function renderEmojis(){
     let storedEmojis = JSON.parse(localStorage.getItem("emojisMaster"));
-        if (storedEmojis!==null){
-            chosenEmojis=storedEmojis;
-        };
+    if (storedEmojis!==null){
+        chosenEmojis=storedEmojis;
+    };
     let emojisContainer = document.createElement("div");
     let emojiTitle = document.createElement("h3");
     let fullUl = document.createElement("ul");
@@ -73,7 +85,7 @@ function renderEmojis(){
     emojiTitle.textContent = "Which emojis that best describe what mood you're in?"
 
     renderEmojiGrid();
-    renderChoices()
+    renderChoices();
     
 
     emojisContainer.appendChild(fullUl);
@@ -105,13 +117,25 @@ function renderEmojis(){
         let n=0;
         let emojiRows = [];
         let subUls = [];
-        let sqr = Math.floor(Math.sqrt(Emoji.instances.length))+1;
-        let emojiRowRem = Emoji.instances.length%sqr;
+        // Add conditions in case of perfect square, because the +1 in
+        // perfect square would produce overflow
+        // Ref(1)
+        let sqr = ()=>{
+            let intCheck = Math.sqrt(Emoji.instances.length)
+            if (Number.isInteger(intCheck)){
+                return intCheck;
+            }
+            else{
+                return Math.floor(intCheck)+1;
+            }; 
+        };
+        let emojiRowRem = Emoji.instances.length%sqr();
+        // --(1)
         let emojiRowN = ()=>{
             if (emojiRowRem>0){
-                return ((Emoji.instances.length-emojiRowRem)/sqr)+1;
+                return ((Emoji.instances.length-emojiRowRem)/sqr())+1;
             } else {
-                return ((Emoji.instances.length-emojiRowRem)/sqr);
+                return ((Emoji.instances.length-emojiRowRem)/sqr());
             };
         };
 
@@ -134,11 +158,11 @@ function renderEmojis(){
             gridCheck(p, false);
             
             p.textContent = Emoji.instances[i].emote;
-            if (subUls[n].childElementCount===sqr){
+            if (subUls[n].childElementCount===sqr()){
                 emojiRows[n].appendChild(subUls[n]);
                 fullUl.appendChild(emojiRows[n]);
                 n++;
-            }
+            };
             li.appendChild(p);
             subUls[n].appendChild(li);
             let x=n+1;
@@ -257,16 +281,16 @@ function renderEmojis(){
 
         if (isBundled){
             emojiListener(element)
-        }
-    }
+        };
+    };
 
     function emojiListener(element){
         if (element.dataset.active==="true"&&chosenEmojis.length<7){
             element.addEventListener("click", addEmoji, { once:true });
         } else {
             element.removeEventListener("click", addEmoji);
-        }
-    }
+        };
+    };
 }
 
 function renderInput(){
