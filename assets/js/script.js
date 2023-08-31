@@ -46,12 +46,13 @@ let containerHeader = document.querySelector("#container-header");
 let headerTitle = document.querySelector("#container-h2");
 let baseCard = document.querySelector("#base-card");
 
+renderEmojis();
+
 function renderEmojis(){
     let storedEmojis = JSON.parse(localStorage.getItem("emojisMaster"));
         if (storedEmojis!==null){
             chosenEmojis=storedEmojis;
         };
-    // let isReady = false;
     let emojisContainer = document.createElement("div");
     let emojiTitle = document.createElement("h3");
     let fullUl = document.createElement("ul");
@@ -96,6 +97,7 @@ function renderEmojis(){
         for (let i=0; i<choiceSlots.length; i++){
             choiceSlots[i].removeEventListener("click", removeEmoji);
         }
+        renderInput()
     }
 
 
@@ -267,7 +269,44 @@ function renderEmojis(){
     }
 }
 
-renderEmojis();
+function renderInput(){
+    baseCard.innerHTML="";
+    // let charN = 0;
+    let inputBox = document.createElement("div");
+    let userForm = document.createElement("form");
+    let question = document.createElement("label");
+    let userInput = document.createElement("textarea");
+    let charMax = document.createElement("p");
+    let inputButton = document.createElement("div");
+    
+    userInput.setAttribute("maxLength", "500")
+
+    question.textContent = "What kind of movie are you into?"
+    charMax.textContent = userInput.value.trim().length+"/"+userInput.maxLength+" Characters"
+
+    userForm.appendChild(question);
+    userForm.appendChild(userInput);
+    userForm.appendChild(charMax);
+    userForm.appendChild(inputButton);
+    inputBox.appendChild(userForm);
+    baseCard.appendChild(inputBox);
+
+    userInput.addEventListener("keydown", charCounter);
+
+    function charCounter(){
+        if (~~~userInput.maxLength<=userInput.value.trim().length){
+            charMax.textContent= userInput.value.trim().length+"/"+userInput.maxLength+" Characters";
+            
+        } else {
+            let key = event.keyCode || event.charCode;
+        
+            if ( key !== 8 && key !== 46 ){
+                console.log("coming soon.")
+            };
+        }
+    }
+    
+};
 
 // fetch("https://emojihub.yurace.pro/api/all")
 //     .then((response)=>{
