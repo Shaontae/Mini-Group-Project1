@@ -39,6 +39,7 @@ function renderEmojis(){
 
     let n=0;
     let rowList = [];
+    let rowUls = [];
     let emojiRowRem = Emoji.instances.length%5;
     let emojiRowN = ((Emoji.instances.length-emojiRowRem)/5)+1
     
@@ -46,28 +47,35 @@ function renderEmojis(){
     emojiTitle.textContent = "Choose 3-7 emojis that best describe what mood you're in."
 
     for (let i=0; i<emojiRowN; i++){
+        let li = document.createElement("li");
         let ul = document.createElement("ul");
-        ul.setAttribute("class", "emoji-row");
-        rowList.push(ul);
+        li.setAttribute("class", "emoji-row");
+        rowList.push(li);
+        rowUls.push(ul);
     };
 
     for (let i = 0; i < Emoji.instances.length; i++) {
         let li = document.createElement('li');
         li.setAttribute("class", "emojiBox");
         li.textContent = Emoji.instances.emoj;
-        if (rowList[n].childElementCount===5){
-            n++
+        if (rowUls[n].childElementCount===5){
+            rowList[n].appendChild(rowUls[n]);
+            fullUl.appendChild(rowList[n])
+            n++;
         }
-        rowList[n].appendChild(li);
+        rowUls[n].appendChild(li);
         // li.addEventListener("click", , { one:true })
     };
-    for (let i = 0; i < rowList.length; i++){
-        fullUl.appendChild(rowList[i]);
-    }
+    // for (let i = 0; i < rowList.length; i++){
+    //     let ul = document.createElement("ul");
+    //     ul.appendChild(rowList[i]);
+    //     fullUl.appendChild(ul);
+    // }
     emojisContainer.appendChild(fullUl);
     baseCard.appendChild(emojisContainer)
 }
 
+renderEmojis()
 
 
 
