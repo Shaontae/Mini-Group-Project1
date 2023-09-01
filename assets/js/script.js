@@ -105,11 +105,11 @@ function renderEmojis(){
         let choiceSlots = document.getElementsByClassName("choiceSlot");
         for (let i=0; i<gridList.length; i++){
             gridList[i].removeEventListener("click", addEmoji);
-        }
+        };
         for (let i=0; i<choiceSlots.length; i++){
             choiceSlots[i].removeEventListener("click", removeEmoji);
-        }
-        renderInput()
+        };
+        renderInput();
     }
 
 
@@ -182,7 +182,7 @@ function renderEmojis(){
         } else {
             button.setAttribute("class", "emoji-submit on");
             button.addEventListener("click", buttonFn, { once:true });
-        }
+        };
     };
 
     function renderChoices(){
@@ -204,15 +204,13 @@ function renderEmojis(){
             p.textContent = chosenEmojis[i].emote;
             li.appendChild(p);
             choiceList.appendChild(li);
-            p.addEventListener("click", removeEmoji, { once:true })
+            p.addEventListener("click", removeEmoji, { once:true });
             
         };
     };
 
     function addEmoji(event){
         let emoji = null;
-        
-
         element = event.target;
         
         for (let i=0; i<Emoji.instances.length; i++){
@@ -227,7 +225,7 @@ function renderEmojis(){
         chosenEmojis.push(emoji);
         localStorage.setItem("emojisMaster", JSON.stringify(chosenEmojis));
         // check all children of parent to delete event listeners
-        addDropChange()
+        addDropChange();
         renderChoices();
         buttonCheck();
     };
@@ -260,8 +258,8 @@ function renderEmojis(){
     function addDropChange(){
         let gridList = document.getElementsByClassName("emojiGrid");
         for (let i=0; i<gridList.length; i++){
-            gridCheck(gridList[i], true)
-        }
+            gridCheck(gridList[i], true);
+        };
     };
 
     function gridCheck(element, isBundled){
@@ -305,6 +303,13 @@ function renderInput(){
     
     userInput.setAttribute("maxLength", "500")
 
+    // let inputBox = document.createElement("div");
+    // let userForm = document.createElement("form");
+    // let question = document.createElement("label");
+    // let userInput = document.createElement("textarea");
+    // let charMax = document.createElement("p");
+    // let inputButton = document.createElement("div");
+
     question.textContent = "What kind of movies are you into?"
     charMax.textContent = userInput.value.trim().length+"/"+userInput.maxLength+" Characters"
 
@@ -341,10 +346,82 @@ function renderInput(){
 //     .then((data)=>{
 //         console.log(data);
 //     })
-
-// let rtUrl = null;
-// let omdbUrl = "http://www.omdbapi.com/?apikey=1aa15ab1&t=gone+with+the+wind&plot=full";
+// let bub = [];
+// let testVar=0;
+let omdbTest=[];
+let rtUrl = null;
+let omdbUrl = "http://www.omdbapi.com/?apikey=1aa15ab1&type=movie&plot=full&s=$comedy";
+// omdbUrl = "http://www.omdbapi.com/?apikey=1aa15ab1&type=movie&plot=full&s=$comedy";
 // fetch(omdbUrl)
+//     .then((response)=>{
+//         if (response.status===200){
+//             return response.json();
+//         }
+//     })
+//     .then((data)=>{
+//         console.log(data)
+//         let w =0;
+//         for (let i=0; i<data.Search.length; i++){
+//             let titleFix = data.Search[i].Title.replace(/\s/g, '+');
+//             fetch("http://www.omdbapi.com/?apikey=1aa15ab1&type=movie&plot=full&t="+titleFix)
+//             .then((response)=>{
+//                 if (response.status===200){
+//                     return response.json();
+//                 } else{
+//                     console.log("Ya fucked it.")
+//                 }
+//             })
+//             .then((data)=>{
+//                 if (data.Plot.includes("not")){
+//                     omdbTest.push(data);
+                    
+//                 }
+                
+//             })
+//             // console.log(w)
+//         }
+        
+//     }).then(()=>{console.log(omdbTest);})
+
+// function allResultsOMDB(object){
+//     let remainder = object.totalResults%10;
+//     let pages = ()=>{
+//         if (remainder===0){
+//             return object.totalResults/10;
+//         } else {
+//             return ((object.totalResults-remainder)/10)+1
+//         };
+//     };
+
+//     let promiseList1 =[]
+//     let promiseList2 =[]
+//     for (let i=0; i<pages(); i++){
+        
+//         let x = i+1;
+//         omdbUrl = "http://www.omdbapi.com/?apikey=1aa15ab1&type=movie&plot=full&tomatoes=true&page="+x+"&s=$comedy";
+//         let testPromise = fetch(omdbUrl)
+//             .then((response)=>{
+//                 if (response.status===200){
+//                     return response.json();
+//                 }
+//             })
+//             .then((data)=>{
+//                 // omdbTest.push(data.response);
+//                 promiseList1.push(testPromise);
+//             })
+//     }
+//     return new Promise((resolve) => {
+//         Promise.all(promiseList1)
+//           .then((proms) =>
+//             proms.forEach((p) => promiseList2.push({
+//               results: p.results
+//             }))
+//           )
+//           .then(() => resolve(promiseList2));
+//       });
+// };
+
+// fetch("https://emojihub.yurace.pro/api/random/category/smileys-and-people")
 //     .then((response)=>{
 //         if (response.status===200){
 //             return response.json();
@@ -354,12 +431,114 @@ function renderInput(){
 //         console.log(data);
 //     })
 
-fetch("https://emojihub.yurace.pro/api/random/category/smileys-and-people")
-    .then((response)=>{
-        if (response.status===200){
-            return response.json();
-        }
-    })
-    .then((data)=>{
-        console.log(data);
-    })
+// moviedb key=654175309f8dda54d6e0ea0c7706fa04
+
+// let mdbUrl = 'https://api.themoviedb.org/3/discover/movie?include_adult=false&include_video=false&language=en-US&page=1&sort_by=popularity.desc&with_keywords=horror&api_key=654175309f8dda54d6e0ea0c7706fa04';
+let mdbUrl = 'https://api.themoviedb.org/3/discover/movie?api_key=654175309f8dda54d6e0ea0c7706fa04&include_adult=false&include_video=false&language=en-US&sort_by=popularity.desc&page=1';
+// let mdbUrl = "https://api.themoviedb.org/3/search/keyword?api_key=654175309f8dda54d6e0ea0c7706fa04&query=alligator"
+// mdbUrl='https://api.themoviedb.org/3/genre/movie/list?language=en&api_key=654175309f8dda54d6e0ea0c7706fa04'
+// mdbUrl='https://api.themoviedb.org/3/discover/movie?include_adult=false&include_video=false&language=en-US&page=1&sort_by=popularity.desc&api_key=654175309f8dda54d6e0ea0c7706fa04'
+mdbUrl = 'https://api.themoviedb.org/3/discover/movie?include_adult=false&include_video=false&language=en-US&page=1&sort_by=popularity.desc&with_genres=10770%2C53&api_key=654175309f8dda54d6e0ea0c7706fa04'
+// mdbUrl = "https://api.themoviedb.org/3/discover/movie?query=alligator&include_adult=false&include_video=false&language=en-US&page=1&sort_by=popularity.desc&api_key=654175309f8dda54d6e0ea0c7706fa04"
+// let testArray = [];
+// fetch(mdbUrl)
+//     .then((response)=>{
+//         if (response.status===200){
+//             return response.json();
+//         }
+//     })
+//     .then((data)=>{
+//         testArray.push(data)
+//         mdbParseResults(data.total_pages, testArray, "prison", "https://api.themoviedb.org/3/discover/movie?api_key=654175309f8dda54d6e0ea0c7706fa04&include_adult=false&include_video=false&language=en-US&sort_by=popularity.desc&with_genres=10770%2C53&page=")
+//     })
+// function mdbParseResults(pages, array, keyword, url){
+//     let x=0;
+//     for (let i=0; i<pages; i++){
+//         x = i+1;
+//         genUrl = url+x;
+//         fetch(genUrl)
+//             .then((response)=>{
+//                 if (response.status===200){
+//                     return response.json();
+//                 };
+//             })
+//             .then((data)=>{
+//                 array.push("bub")
+//             })
+//     }
+// };
+
+// function mdbParseResults(pages, array, keyword, url){
+//     let x=0;
+//     for (let i=0; i<pages; i++){
+//         x = i+1;
+//         genUrl = url+x;
+//         fetch(genUrl)
+//             .then((response)=>{
+//                 if (response.status===200){
+//                     return response.json();
+//                 };
+//             })
+//             .then((data)=>{
+//                 array.push("bub")
+                
+//                 // This is also specific to themoviedb because object keys can't be passed as arguments
+//                 for (let n=0; n<data.results.length; n++){
+//                     // genArray(data.results[i]);
+//                     // if (data.results[n].overview!==undefined&&data.results[n].hasOwnProperty("overview")){
+//                     // }
+                    
+//                     if (data.results[n].overview.includes(keyword)){
+//                         // testArray.push(data.results[n]);
+//                         // testArray.push("bub");
+//                     }
+//                 };
+//             })
+//     }
+//     // function genArray(object){
+//     //     // Gotta get specific for each api call
+//         // if (object.overview.includes(keyword)){
+//         //     array.push(object);
+//         // }
+//     // }
+// };
+
+
+
+// function tabulateResults(data, totalResults, limit, array, keyword, url){
+//     let remainder = data.%limit;
+//     let pages = ()=>{
+//         if (remainder===0){
+//             return data.totalResults/limit;
+//         } else {
+//             return ((data.totalResults-remainder)/limit)+1
+//         };
+//     };
+
+//     for (let i=0; i<pages(); i++){
+//         let x = i+1;
+//         genUrl = url+x;
+//         fetch(genUrl)
+//             .then((response)=>{
+//                 if (response.status===200){
+//                     return response.json();
+//                 }
+//             })
+//             .then((data)=>{
+                
+//                 // This is also specific to themoviedb because object keys can't be passed as arguments
+//                 for (let i=0; i<limit; i++)
+//                     genArray(data.results[i]);
+//             })
+//     }
+//     function genArray(object){
+//         // Gotta get specific for each api call
+//         if (object.overview.includes(keyword)){
+//             array.push(object);
+//         }
+//     }
+// };
+
+fetch("https://api.dictionaryapi.dev/api/v2/entries/en/tug")
+    .then((response)=>{return response.json()})
+    .then((data)=>{console.log(data)})
