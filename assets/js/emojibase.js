@@ -1,4 +1,4 @@
-[
+var emojiData = [
     {
         "name": "grinning face",
         "category": "smileys and people",
@@ -8060,3 +8060,15 @@
         "unicode": ["U+1F6D2"]
     }
 ]
+
+
+emojiIndexer();
+
+
+
+function emojiIndexer(){
+    for (let i=0; i<emojiData.length; i++){
+        emojiData[i]["index"] = i;
+    }
+}
+

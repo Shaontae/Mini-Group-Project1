@@ -3,6 +3,7 @@
     --color2: rgb(31, 31, 124);
     --color3: grey;
     --color4: whitesmoke;
+    --shadow: rgb(0,0,0,0.5);
 
 }
 
@@ -18,7 +19,7 @@ header{
     background-color: var(--color2);
     color: var(--color1);
     display: flex;
-    justify-content: center;
+    justify-content: space-between;
     align-items: center;
     padding: 1rem;
 }
@@ -26,6 +27,30 @@ header{
 
 h1{
  font-size: 3rem;
+}
+
+.reset-button{
+    background-color: var(--color1);
+    font-size: 1.5rem;
+    color: var(--color2);
+    padding: .5rem 1rem;
+    /* border: 2px outset black; */
+    box-shadow: 2px 7px 5px 5px var(--shadow);
+}
+
+.reset-button:hover{
+    cursor: pointer;
+    /* border: 2px ridge black; */
+    box-shadow: 0 5px 5px 3px black;
+    margin-bottom: .125rem;
+}
+
+.reset-button:active{
+    cursor: pointer;
+    color: black;
+    /* border: 2px ridge black; */
+    box-shadow: 0 3px 5px 2px black;
+    margin-bottom: .25rem;
 }
 
 main{
