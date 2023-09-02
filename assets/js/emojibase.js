@@ -8061,14 +8061,13 @@ var emojiData = [
     }
 ]
 
-
-emojiIndexer();
-
+// emojiIndexer();
 
 
-function emojiIndexer(){
-    for (let i=0; i<emojiData.length; i++){
-        emojiData[i]["index"] = i;
-    }
-}
+
+// function emojiIndexer(){
+//     for (let i=0; i<emojiData.length; i++){
+//         emojiData[i]["index"] = i;
+//     }
+// }
 

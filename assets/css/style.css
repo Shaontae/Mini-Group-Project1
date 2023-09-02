@@ -108,6 +108,60 @@ h3{
     font-size: 1.5rem;
 }
 
+.emoji-choice-list{
+    display: flex;
+    flex-direction: row;
+    /* gap: 1rem; */
+}
+
+.emoji-submit{
+    border: 2px outset black;
+    font-size: 1.5rem;
+    padding: 1rem 2rem;
+}
+
+.emoji-submit.on{
+    background-color: var(--color1);
+}
+
+.emoji-submit.on:hover{
+    cursor: pointer;
+    box-shadow: 0 0 10px yellow;
+}
+
+.emoji-submit.on:active{
+    box-shadow: none;
+}
+
+.emoji-submit.off{
+    background-color: rgb(94, 93, 93);
+}
+
+
+/* Start Screen Styles */
+.contentCard{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+
+.randoInput{
+    font-size: 1.5rem;
+    margin-top: 1rem;
+    margin-bottom: 1.5rem;
+    padding: .5rem;
+}
+
+.emptyBox{
+    display: flex;
+    min-height: 20rem;
+    min-width: 20rem;
+}
+/* /Start Screen Styles */
+
+
+/* Emoji Grid Styles */
 .emoji-container{
     padding: 1rem;
 
@@ -179,33 +233,6 @@ h3{
     margin-top: 1rem;
     margin-bottom: 1rem;
 }
+/* /Emoji Grid Styles */
 
-.emoji-choice-list{
-    display: flex;
-    flex-direction: row;
-    /* gap: 1rem; */
-}
-
-.emoji-submit{
-    border: 2px outset black;
-    font-size: 1.5rem;
-    padding: 1rem 2rem;
-}
-
-.emoji-submit.on{
-    background-color: var(--color1);
-}
-
-.emoji-submit.on:hover{
-    cursor: pointer;
-    box-shadow: 0 0 10px yellow;
-}
-
-.emoji-submit.on:active{
-    box-shadow: none;
-}
-
-.emoji-submit.off{
-    background-color: rgb(94, 93, 93);
-}
 

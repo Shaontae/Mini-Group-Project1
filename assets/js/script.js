@@ -53,245 +53,109 @@ const inLove = new Emoji("loved", "💘", ['lovestruck', 'loving', 'careful', 'f
 let chosenEmojis = [];
 let emojiNum = 0;
 let stage = 0;
+let stageArray = [renderStart, renderEmojis, renderInput];
 
 
 let container = document.querySelector("#container");
 let containerHeader = document.querySelector("#container-header");
 let headerTitle = document.querySelector("#container-h2");
 let baseCard = document.querySelector("#base-card");
+let resetButton = document.querySelector("#reset-button");
 
-renderEmojis();
+resetButton.addEventListener("click", resetButtonFn);
 
-// function renderEmojis(){
-//     let storedEmojis = JSON.parse(localStorage.getItem("emojisMaster"));
-//     if (storedEmojis!==null){
-//         chosenEmojis=storedEmojis;
-//     };
-//     let emojisContainer = document.createElement("div");
-//     let emojiTitle = document.createElement("h3");
-//     let fullUl = document.createElement("ul");
+// renderEmojis();
 
-//     let choiceBox = document.createElement("div");
-//     let button = document.createElement("div");
-//     let emojiRules = document.createElement("h3");
-//     let choiceList = document.createElement("ul");
+stageUpFunction()
 
-//     choiceList.setAttribute("class", "emoji-choice-list");
-//     choiceBox.setAttribute("class", "emoji-choice-box");
-//     fullUl.setAttribute("class", "fullUl");
-//     emojisContainer.setAttribute("class", "emoji-container");
+// Misc. FUnctions
+function stageUpFunction(){
+    let storedStage = JSON.parse(localStorage.getItem("stageMaster"));
+    if (storedStage !== null){
+        stage = storedStage
+    };
+    stageArray[stage]();
+};
 
-//     button.textContent = "NEXT";
-//     emojiRules.textContent = "Choose 3-7 Emojis"
-//     headerTitle.textContent = "How are you feeling?";
-//     emojiTitle.textContent = "Which emojis that best describe what mood you're in?"
+function resetButtonFn(){
+    // JSON List:
+    // stage (number) - stageMaster
+    // emojiNum (number) - eNumMaster
+    // chosenEmojis (array) - emojisMaster
+    // more to come
 
-//     renderEmojiGrid();
-//     renderChoices();
-    
+    stage = 0;
+    emojiNum = 0;
+    chosenEmojis = []
 
-//     emojisContainer.appendChild(fullUl);
-//     choiceBox.appendChild(choiceList);
-//     baseCard.appendChild(emojiTitle);
-//     baseCard.appendChild(emojisContainer);
-//     baseCard.appendChild(emojiRules);
-//     baseCard.appendChild(choiceBox);
-//     baseCard.appendChild(button);
-    
-//     buttonCheck();
-
-//     // button.addEventListener("click", buttonFn,{ once:true })
-
-//     function buttonFn(){
-//         let gridList = document.getElementsByClassName("emojiGrid");
-//         let choiceSlots = document.getElementsByClassName("choiceSlot");
-//         for (let i=0; i<gridList.length; i++){
-//             gridList[i].removeEventListener("click", addEmoji);
-//         };
-//         for (let i=0; i<choiceSlots.length; i++){
-//             choiceSlots[i].removeEventListener("click", removeEmoji);
-//         };
-//         renderInput();
-//     }
+    localStorage.setItem("emojisMaster", chosenEmojis);
+    localStorage.setItem("stagesMaster", stage);
+    localStorage.setItem("eNumMaster", emojiNum);
 
 
-//     function renderEmojiGrid(){
-//         let n=0;
-//         let emojiRows = [];
-//         let subUls = [];
-//         // Add conditions in case of perfect square, because the +1 in
-//         // perfect square would produce overflow
-//         // Ref(1)
-//         let sqr = ()=>{
-//             let intCheck = Math.sqrt(emojiData.length)
-//             if (Number.isInteger(intCheck)){
-//                 return intCheck;
-//             }
-//             else{
-//                 return Math.floor(intCheck)+1;
-//             }; 
-//         };
-//         let emojiRowRem = emojiData.length%sqr();
-//         // --(1)
-//         let emojiRowN = ()=>{
-//             if (emojiRowRem>0){
-//                 return ((emojiData.length-emojiRowRem)/sqr())+1;
-//             } else {
-//                 return ((emojiData.length-emojiRowRem)/sqr());
-//             };
-//         };
+    // call startupFunction
+    stageUpFunction();
+};
 
-//         for (let i=0; i<emojiRowN(); i++){
-//             let li = document.createElement("li");
-//             let ul = document.createElement("ul");
-//             ul.setAttribute("class", "emoji-row");
-//             li.setAttribute("class", "emojiEl");
-//             emojiRows.push(li);
-//             subUls.push(ul);
-//         };
+function buttonCheckG(element, condition){
+    if (!condition){
+        element.setAttribute("class", "emoji-submit off");
+        element.removeEventListener("click", buttonFnG);
+    } else {
+        element.setAttribute("class", "emoji-submit on");
+        element.addEventListener("click", buttonFnG, { once:true });
+    };
+};
 
-        
-//         for (let i = 0; i < emojiData.length; i++) {
-//             let li = document.createElement('li');
-//             let p = document.createElement('p');
-//             li.setAttribute("class", "emojiBox");
-            
-//             p.setAttribute("data-index", emojiData[i].index);
-//             gridCheck(p, false);
-            
-//             p.textContent = emojiData[i].emote;
-//             if (subUls[n].childElementCount===sqr()){
-//                 emojiRows[n].appendChild(subUls[n]);
-//                 fullUl.appendChild(emojiRows[n]);
-//                 n++;
-//             };
-//             li.appendChild(p);
-//             subUls[n].appendChild(li);
-//             let x=n+1;
-//             if (x===emojiRowN()&&i+1===emojiData.length){
-//                 emojiRows[n].appendChild(subUls[n]);
-//                 fullUl.appendChild(emojiRows[n]);
-//             };
-//             // p.addEventListener("click", addEmoji, { once:true })
-//             emojiListener(p);
-//         };
-//     };
 
-//     function buttonCheck(){
-//         if (chosenEmojis.length<3){
-//             button.setAttribute("class", "emoji-submit off");
-//             button.removeEventListener("click", buttonFn);
-//         } else {
-//             button.setAttribute("class", "emoji-submit on");
-//             button.addEventListener("click", buttonFn, { once:true });
-//         };
-//     };
+function buttonFnG(){
+    baseCard.innerHTML='';
+    stage++
+    localStorage.setItem("stageMaster", stage);
+    stageUpFunction();
+}
 
-//     function renderChoices(){
-//         let storedEmojis = JSON.parse(localStorage.getItem("emojisMaster"));
-//         if (storedEmojis!==null){
-//             chosenEmojis=storedEmojis;
-//         };
-//         choiceList.innerHTML='';
-//         for (let i=0; i<chosenEmojis.length; i++){
-//             let li = document.createElement("li");
-//             let p = document.createElement("p");
-//             // let emojiMatch = ()=>{
 
-//             // };
-//             p.setAttribute("data-index", chosenEmojis[i].index);
-            
-//             li.setAttribute("class", "emojiBox");
-//             p.setAttribute("class", "choiceSlot emojiImg on");
-//             p.textContent = chosenEmojis[i].emote;
-//             li.appendChild(p);
-//             choiceList.appendChild(li);
-//             p.addEventListener("click", removeEmoji, { once:true });
-            
-//         };
-//     };
+// Render Functions
 
-//     function addEmoji(event){
-//         let emoji = null;
-//         element = event.target;
-        
-//         for (let i=0; i<emojiData.length; i++){
-//             if (~~element.dataset.index===emojiData[i].index){
-//                 emoji=emojiData[i];
-//             };
-//         };
-//         let storedEmojis = JSON.parse(localStorage.getItem("emojisMaster"));
-//         if (storedEmojis!==null){
-//             chosenEmojis=storedEmojis;
-//         };
-//         chosenEmojis.push(emoji);
-//         localStorage.setItem("emojisMaster", JSON.stringify(chosenEmojis));
-//         // check all children of parent to delete event listeners
-//         addDropChange();
-//         renderChoices();
-//         buttonCheck();
-//     };
+function renderStart(){
+    let randoTitle = document.createElement("h3");
+    let randoInput = document.createElement("input");
+    // let numLimit = document.createElement("p");
+    let button = document.createElement("div");
+    let contentCard = document.createElement("div");
+    let emptyBox = document.createElement("div");
 
-//     function removeEmoji(event){
-//         let emoji = null;
-//         let storedEmojis = JSON.parse(localStorage.getItem("emojisMaster"));
-//         if (storedEmojis!==null){
-//             chosenEmojis=storedEmojis;
-//         };
-        
-//         element = event.target;
-//         for (let i=0; i<emojiData.length; i++){
-//             if (~~element.dataset.index===emojiData[i].index){
-                
-//                 emoji=emojiData[i];
-//             };
-//         };
-//         for (let i=0; i<chosenEmojis.length; i++){
-//             if (chosenEmojis[i].index===emoji.index){ 
-//                 chosenEmojis.splice(i, 1);
-//             };
-//         };
-//         localStorage.setItem("emojisMaster", JSON.stringify(chosenEmojis));
-//         addDropChange()
-//         renderChoices();
-//         buttonCheck();
-//     }
+    let limitVal = ()=>{
+        if (~~randoInput.value<1089&&randoInput.value>25&&~~randoInput.value!==''){
+            return true
+        } else {
+            return false
+        };
+    };
 
-//     function addDropChange(){
-//         let gridList = document.getElementsByClassName("emojiGrid");
-//         for (let i=0; i<gridList.length; i++){
-//             gridCheck(gridList[i], true);
-//         };
-//     };
+    randoInput.setAttribute("class", "randoInput");
+    randoInput.setAttribute("placeholder", "25-1089");
+    randoInput.setAttribute("value", "");
 
-//     function gridCheck(element, isBundled){
-//         let isIncludes = false;
-//         for (let ix=0; ix<chosenEmojis.length; ix++){
-//             if (~~element.dataset.index===chosenEmojis[ix].index){
-//                     isIncludes=true;
-//                 }
-//         };
-//         if (isIncludes){
-//             element.setAttribute("data-active", "false");
-//             element.setAttribute("class", "emojiGrid emojiImg off");
-//         } else{
-//             element.setAttribute("data-active", "true");
-//             element.setAttribute("class", "emojiGrid emojiImg on");
-//         };
+    contentCard.setAttribute("class", "contentCard");
+    emptyBox.setAttribute("class", "emptyBox");
 
-//         if (isBundled){
-//             emojiListener(element)
-//         };
-//     };
+    headerTitle.textContent = "Start";
+    randoTitle.textContent = "Choose the number of Emojis choices you want."
+    // numLimit.textContent = "25-1089";
+    button.textContent = "NEXT";
 
-//     function emojiListener(element){
-//         if (element.dataset.active==="true"&&chosenEmojis.length<7){
-//             element.addEventListener("click", addEmoji, { once:true });
-//         } else {
-//             element.removeEventListener("click", addEmoji);
-//         };
-//     };
-// }
+    buttonCheckG(button, limitVal())
+
+    contentCard.append(randoTitle);
+    contentCard.append(randoInput);
+    contentCard.append(button);
+    baseCard.append(contentCard);
+    baseCard.append(emptyBox);
+
+}
+
 
 function renderEmojis(){
     let storedEmojis = JSON.parse(localStorage.getItem("emojisMaster"));
@@ -524,6 +388,238 @@ function renderEmojis(){
     };
 }
 
+// New Render with emojiData
+// function renderEmojis(){
+//     let storedEmojis = JSON.parse(localStorage.getItem("emojisMaster"));
+//     if (storedEmojis!==null){
+//         chosenEmojis=storedEmojis;
+//     };
+//     let emojisContainer = document.createElement("div");
+//     let emojiTitle = document.createElement("h3");
+//     let fullUl = document.createElement("ul");
+
+//     let choiceBox = document.createElement("div");
+//     let button = document.createElement("div");
+//     let emojiRules = document.createElement("h3");
+//     let choiceList = document.createElement("ul");
+
+//     choiceList.setAttribute("class", "emoji-choice-list");
+//     choiceBox.setAttribute("class", "emoji-choice-box");
+//     fullUl.setAttribute("class", "fullUl");
+//     emojisContainer.setAttribute("class", "emoji-container");
+
+//     button.textContent = "NEXT";
+//     emojiRules.textContent = "Choose 3-7 Emojis"
+//     headerTitle.textContent = "How are you feeling?";
+//     emojiTitle.textContent = "Which emojis that best describe what mood you're in?"
+
+//     renderEmojiGrid();
+//     renderChoices();
+    
+
+//     emojisContainer.appendChild(fullUl);
+//     choiceBox.appendChild(choiceList);
+//     baseCard.appendChild(emojiTitle);
+//     baseCard.appendChild(emojisContainer);
+//     baseCard.appendChild(emojiRules);
+//     baseCard.appendChild(choiceBox);
+//     baseCard.appendChild(button);
+    
+//     buttonCheck();
+
+//     // button.addEventListener("click", buttonFn,{ once:true })
+
+//     function buttonFn(){
+//         let gridList = document.getElementsByClassName("emojiGrid");
+//         let choiceSlots = document.getElementsByClassName("choiceSlot");
+//         for (let i=0; i<gridList.length; i++){
+//             gridList[i].removeEventListener("click", addEmoji);
+//         };
+//         for (let i=0; i<choiceSlots.length; i++){
+//             choiceSlots[i].removeEventListener("click", removeEmoji);
+//         };
+//         renderInput();
+//     }
+
+
+//     function renderEmojiGrid(){
+//         let n=0;
+//         let emojiRows = [];
+//         let subUls = [];
+//         // Add conditions in case of perfect square, because the +1 in
+//         // perfect square would produce overflow
+//         // Ref(1)
+//         let sqr = ()=>{
+//             let intCheck = Math.sqrt(emojiData.length)
+//             if (Number.isInteger(intCheck)){
+//                 return intCheck;
+//             }
+//             else{
+//                 return Math.floor(intCheck)+1;
+//             }; 
+//         };
+//         let emojiRowRem = emojiData.length%sqr();
+//         // --(1)
+//         let emojiRowN = ()=>{
+//             if (emojiRowRem>0){
+//                 return ((emojiData.length-emojiRowRem)/sqr())+1;
+//             } else {
+//                 return ((emojiData.length-emojiRowRem)/sqr());
+//             };
+//         };
+
+//         for (let i=0; i<emojiRowN(); i++){
+//             let li = document.createElement("li");
+//             let ul = document.createElement("ul");
+//             ul.setAttribute("class", "emoji-row");
+//             li.setAttribute("class", "emojiEl");
+//             emojiRows.push(li);
+//             subUls.push(ul);
+//         };
+
+        
+//         for (let i = 0; i < emojiData.length; i++) {
+//             let li = document.createElement('li');
+//             let p = document.createElement('p');
+//             li.setAttribute("class", "emojiBox");
+            
+//             p.setAttribute("data-index", emojiData[i].index);
+//             gridCheck(p, false);
+            
+//             p.textContent = emojiData[i].emote;
+//             if (subUls[n].childElementCount===sqr()){
+//                 emojiRows[n].appendChild(subUls[n]);
+//                 fullUl.appendChild(emojiRows[n]);
+//                 n++;
+//             };
+//             li.appendChild(p);
+//             subUls[n].appendChild(li);
+//             let x=n+1;
+//             if (x===emojiRowN()&&i+1===emojiData.length){
+//                 emojiRows[n].appendChild(subUls[n]);
+//                 fullUl.appendChild(emojiRows[n]);
+//             };
+//             // p.addEventListener("click", addEmoji, { once:true })
+//             emojiListener(p);
+//         };
+//     };
+
+//     function buttonCheck(){
+//         if (chosenEmojis.length<3){
+//             button.setAttribute("class", "emoji-submit off");
+//             button.removeEventListener("click", buttonFn);
+//         } else {
+//             button.setAttribute("class", "emoji-submit on");
+//             button.addEventListener("click", buttonFn, { once:true });
+//         };
+//     };
+
+//     function renderChoices(){
+//         let storedEmojis = JSON.parse(localStorage.getItem("emojisMaster"));
+//         if (storedEmojis!==null){
+//             chosenEmojis=storedEmojis;
+//         };
+//         choiceList.innerHTML='';
+//         for (let i=0; i<chosenEmojis.length; i++){
+//             let li = document.createElement("li");
+//             let p = document.createElement("p");
+//             // let emojiMatch = ()=>{
+
+//             // };
+//             p.setAttribute("data-index", chosenEmojis[i].index);
+            
+//             li.setAttribute("class", "emojiBox");
+//             p.setAttribute("class", "choiceSlot emojiImg on");
+//             p.textContent = chosenEmojis[i].emote;
+//             li.appendChild(p);
+//             choiceList.appendChild(li);
+//             p.addEventListener("click", removeEmoji, { once:true });
+            
+//         };
+//     };
+
+//     function addEmoji(event){
+//         let emoji = null;
+//         element = event.target;
+        
+//         for (let i=0; i<emojiData.length; i++){
+//             if (~~element.dataset.index===emojiData[i].index){
+//                 emoji=emojiData[i];
+//             };
+//         };
+//         let storedEmojis = JSON.parse(localStorage.getItem("emojisMaster"));
+//         if (storedEmojis!==null){
+//             chosenEmojis=storedEmojis;
+//         };
+//         chosenEmojis.push(emoji);
+//         localStorage.setItem("emojisMaster", JSON.stringify(chosenEmojis));
+//         // check all children of parent to delete event listeners
+//         addDropChange();
+//         renderChoices();
+//         buttonCheck();
+//     };
+
+//     function removeEmoji(event){
+//         let emoji = null;
+//         let storedEmojis = JSON.parse(localStorage.getItem("emojisMaster"));
+//         if (storedEmojis!==null){
+//             chosenEmojis=storedEmojis;
+//         };
+        
+//         element = event.target;
+//         for (let i=0; i<emojiData.length; i++){
+//             if (~~element.dataset.index===emojiData[i].index){
+                
+//                 emoji=emojiData[i];
+//             };
+//         };
+//         for (let i=0; i<chosenEmojis.length; i++){
+//             if (chosenEmojis[i].index===emoji.index){ 
+//                 chosenEmojis.splice(i, 1);
+//             };
+//         };
+//         localStorage.setItem("emojisMaster", JSON.stringify(chosenEmojis));
+//         addDropChange()
+//         renderChoices();
+//         buttonCheck();
+//     }
+
+//     function addDropChange(){
+//         let gridList = document.getElementsByClassName("emojiGrid");
+//         for (let i=0; i<gridList.length; i++){
+//             gridCheck(gridList[i], true);
+//         };
+//     };
+
+//     function gridCheck(element, isBundled){
+//         let isIncludes = false;
+//         for (let ix=0; ix<chosenEmojis.length; ix++){
+//             if (~~element.dataset.index===chosenEmojis[ix].index){
+//                     isIncludes=true;
+//                 }
+//         };
+//         if (isIncludes){
+//             element.setAttribute("data-active", "false");
+//             element.setAttribute("class", "emojiGrid emojiImg off");
+//         } else{
+//             element.setAttribute("data-active", "true");
+//             element.setAttribute("class", "emojiGrid emojiImg on");
+//         };
+
+//         if (isBundled){
+//             emojiListener(element)
+//         };
+//     };
+
+//     function emojiListener(element){
+//         if (element.dataset.active==="true"&&chosenEmojis.length<7){
+//             element.addEventListener("click", addEmoji, { once:true });
+//         } else {
+//             element.removeEventListener("click", addEmoji);
+//         };
+//     };
+// }
+
 function renderInput(){
     baseCard.innerHTML="";
     // let charN = 0;
@@ -667,11 +763,11 @@ let omdbUrl = "http://www.omdbapi.com/?apikey=1aa15ab1&type=movie&plot=full&s=$c
 // moviedb key=654175309f8dda54d6e0ea0c7706fa04
 
 // let mdbUrl = 'https://api.themoviedb.org/3/discover/movie?include_adult=false&include_video=false&language=en-US&page=1&sort_by=popularity.desc&with_keywords=horror&api_key=654175309f8dda54d6e0ea0c7706fa04';
-let mdbUrl = 'https://api.themoviedb.org/3/discover/movie?api_key=654175309f8dda54d6e0ea0c7706fa04&include_adult=false&include_video=false&language=en-US&sort_by=popularity.desc&page=1';
+// let mdbUrl = 'https://api.themoviedb.org/3/discover/movie?api_key=654175309f8dda54d6e0ea0c7706fa04&include_adult=false&include_video=false&language=en-US&sort_by=popularity.desc&page=1';
 // let mdbUrl = "https://api.themoviedb.org/3/search/keyword?api_key=654175309f8dda54d6e0ea0c7706fa04&query=alligator"
 // mdbUrl='https://api.themoviedb.org/3/genre/movie/list?language=en&api_key=654175309f8dda54d6e0ea0c7706fa04'
 // mdbUrl='https://api.themoviedb.org/3/discover/movie?include_adult=false&include_video=false&language=en-US&page=1&sort_by=popularity.desc&api_key=654175309f8dda54d6e0ea0c7706fa04'
-mdbUrl = 'https://api.themoviedb.org/3/discover/movie?include_adult=false&include_video=false&language=en-US&page=1&sort_by=popularity.desc&with_genres=10770%2C53&api_key=654175309f8dda54d6e0ea0c7706fa04'
+// mdbUrl = 'https://api.themoviedb.org/3/discover/movie?include_adult=false&include_video=false&language=en-US&page=1&sort_by=popularity.desc&with_genres=10770%2C53&api_key=654175309f8dda54d6e0ea0c7706fa04'
 // mdbUrl = "https://api.themoviedb.org/3/discover/movie?query=alligator&include_adult=false&include_video=false&language=en-US&page=1&sort_by=popularity.desc&api_key=654175309f8dda54d6e0ea0c7706fa04"
 // let testArray = [];
 // fetch(mdbUrl)
