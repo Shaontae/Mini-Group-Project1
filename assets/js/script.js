@@ -1,57 +1,6 @@
-class Emoji{
-    static instances = [];
-    constructor(emo, emote, keywords){
-        this.emo = emo,
-        this.emote = emote;
-        this.keywords = keywords,
-        this.index = Emoji.instances.length;
-        Emoji.instances.push(this)
-    }
-}
-
-const crying = new Emoji("sad", "😭", ['sad', 'depressed', 'unwell', 'anxious', 'hysterical']);
-const smile = new Emoji("happy", "😀", ['happy', 'elated', 'good', 'fair']);
-const red = new Emoji("angry", "😡", ['angry', 'mad', 'fuming', 'angered', 'pissed', 'infuriated']);
-const gasp = new Emoji("shocked", "😯", ['shocked', 'spooked', 'nervous', 'scared']);
-const upsideDownSmiley = new Emoji("uneasy", "🙃", ['uneasy', 'nervous', 'restless', 'tense']);
-const loved = new Emoji("loving", "🥰", ['loving', 'affectionate', 'romantical', 'passionate']);
-const moneyTongue = new Emoji("moneyHungry", "🤑", ['greedy', 'eager', 'desirous', 'materialistic', 'moneygrubbing']);
-const hmm = new Emoji("thinking", "🤔", ['curious', 'interested', 'documentary', 'quizzical']);
-const sick = new Emoji("sick", "🤒", ['sick', 'unwell', 'ill']);
-const disgusted = new Emoji("disgust", "🤢", ['sick', 'unwell', 'ill', 'disgusted', 'unwell']);
-const queasy = new Emoji("queasy", "🥴", ['Queasy', 'squeamish', 'woozy', 'nauseous']);
-const cowboy = new Emoji("cowboy", "🤠", ['old-timey', 'western', 'cowboy', 'wildwest']);
-const nerd = new Emoji("nerdy", "🤓", ['smart', 'nerdy', 'intelligent', 'intellectual']);
-const tired = new Emoji("yawn", "🥱", ['tired', 'exhausted', 'sprung-out']);
-const inLove = new Emoji("loved", "💘", ['lovestruck', 'loving', 'careful', 'flamboyant']);
-// const test1 = new Emoji("loved", "💘", ['lovestruck', 'loving', 'careful', 'flamboyant']);
-// const test2 = new Emoji("loved", "💘", ['lovestruck', 'loving', 'careful', 'flamboyant']);
-// const test3 = new Emoji("loved", "💘", ['lovestruck', 'loving', 'careful', 'flamboyant']);
-// const test4 = new Emoji("loved", "💘", ['lovestruck', 'loving', 'careful', 'flamboyant']);
-// const test5 = new Emoji("loved", "💘", ['lovestruck', 'loving', 'careful', 'flamboyant']);
-// const test6 = new Emoji("loved", "💘", ['lovestruck', 'loving', 'careful', 'flamboyant']);
-// const test7 = new Emoji("loved", "💘", ['lovestruck', 'loving', 'careful', 'flamboyant']);
-// const test8 = new Emoji("loved", "💘", ['lovestruck', 'loving', 'careful', 'flamboyant']);
-// const test9 = new Emoji("loved", "💘", ['lovestruck', 'loving', 'careful', 'flamboyant']);
-// const test10 = new Emoji("loved", "💘", ['lovestruck', 'loving', 'careful', 'flamboyant']);
-// const test11 = new Emoji("loved", "💘", ['lovestruck', 'loving', 'careful', 'flamboyant']);
-// const test12 = new Emoji("loved", "💘", ['lovestruck', 'loving', 'careful', 'flamboyant']);
-// const test13 = new Emoji("loved", "💘", ['lovestruck', 'loving', 'careful', 'flamboyant']);
-// const test14 = new Emoji("loved", "💘", ['lovestruck', 'loving', 'careful', 'flamboyant']);
-// const test15 = new Emoji("loved", "💘", ['lovestruck', 'loving', 'careful', 'flamboyant']);
-// const test16 = new Emoji("loved", "💘", ['lovestruck', 'loving', 'careful', 'flamboyant']);
-// const test17 = new Emoji("loved", "💘", ['lovestruck', 'loving', 'careful', 'flamboyant']);
-// const test18 = new Emoji("loved", "💘", ['lovestruck', 'loving', 'careful', 'flamboyant']);
-// const test19 = new Emoji("loved", "💘", ['lovestruck', 'loving', 'careful', 'flamboyant']);
-// const test20 = new Emoji("loved", "💘", ['lovestruck', 'loving', 'careful', 'flamboyant']);
-// const test21 = new Emoji("loved", "💘", ['lovestruck', 'loving', 'careful', 'flamboyant']);
-// const test22 = new Emoji("loved", "💘", ['lovestruck', 'loving', 'careful', 'flamboyant']);
-// const test23 = new Emoji("loved", "💘", ['lovestruck', 'loving', 'careful', 'flamboyant']);
-// const test24 = new Emoji("loved", "💘", ['lovestruck', 'loving', 'careful', 'flamboyant']);
-
-
 let chosenEmojis = [];
-let emojiNum = 0;
+let eligibleEmojis = [];
+// let emojiNum = 0;
 let stage = 0;
 let stageArray = [renderStart, renderEmojis, renderInput];
 
@@ -66,68 +15,79 @@ resetButton.addEventListener("click", resetButtonFn);
 
 // renderEmojis();
 
-stageUpFunction()
+stageFunction()
 
 // Misc. FUnctions
-function stageUpFunction(){
+function stageFunction(){
     let storedStage = JSON.parse(localStorage.getItem("stageMaster"));
     if (storedStage !== null){
-        stage = storedStage
+        stage = ~~storedStage;
     };
     stageArray[stage]();
 };
 
 function resetButtonFn(){
+    
     // JSON List:
     // stage (number) - stageMaster
     // emojiNum (number) - eNumMaster
     // chosenEmojis (array) - emojisMaster
+    // eligibleEmojis (array) - eligibleMaster
     // more to come
 
-    stage = 0;
-    emojiNum = 0;
-    chosenEmojis = []
+    baseCard.innerHTML = '';
 
-    localStorage.setItem("emojisMaster", chosenEmojis);
-    localStorage.setItem("stagesMaster", stage);
-    localStorage.setItem("eNumMaster", emojiNum);
+    stage = 0;
+    // emojiNum = 0;
+    chosenEmojis = [];
+    eligibleEmojis = [];
+    
+    
+    localStorage.setItem("stageMaster", JSON.stringify(stage));
+    // localStorage.setItem("eNumMaster", JSON.stringify(emojiNum));
+    localStorage.setItem("emojisMaster", JSON.stringify(chosenEmojis));
+    localStorage.setItem("eligibleMaster", JSON.stringify(eligibleEmojis));
 
 
     // call startupFunction
-    stageUpFunction();
+    
+    stageFunction();
 };
 
-function buttonCheckG(element, condition){
+function buttonCheck(element, condition, fn){
+    console.log(condition)
     if (!condition){
         element.setAttribute("class", "emoji-submit off");
-        element.removeEventListener("click", buttonFnG);
+        element.removeEventListener("click", fn);
     } else {
         element.setAttribute("class", "emoji-submit on");
-        element.addEventListener("click", buttonFnG, { once:true });
+        element.addEventListener("click", fn, { once:true });
     };
 };
 
 
-function buttonFnG(){
+function stageUpFn(){
     baseCard.innerHTML='';
     stage++
-    localStorage.setItem("stageMaster", stage);
-    stageUpFunction();
-}
+    localStorage.setItem("stageMaster", JSON.stringify(stage));
+    stageFunction();
+};
 
 
 // Render Functions
 
 function renderStart(){
+    let emojiNum = 0;
+
     let randoTitle = document.createElement("h3");
     let randoInput = document.createElement("input");
-    // let numLimit = document.createElement("p");
     let button = document.createElement("div");
     let contentCard = document.createElement("div");
     let emptyBox = document.createElement("div");
 
     let limitVal = ()=>{
-        if (~~randoInput.value<1089&&randoInput.value>25&&~~randoInput.value!==''){
+        // if (~~randoInput.value>=25&&~~randoInput.value<=1089&&~~randoInput.value!==''){
+        if (~~randoInput.value>=25&&~~randoInput.value<=1089){
             return true
         } else {
             return false
@@ -143,10 +103,9 @@ function renderStart(){
 
     headerTitle.textContent = "Start";
     randoTitle.textContent = "Choose the number of Emojis choices you want."
-    // numLimit.textContent = "25-1089";
     button.textContent = "NEXT";
 
-    buttonCheckG(button, limitVal())
+    buttonCheck(button, limitVal());
 
     contentCard.append(randoTitle);
     contentCard.append(randoInput);
@@ -154,50 +113,133 @@ function renderStart(){
     baseCard.append(contentCard);
     baseCard.append(emptyBox);
 
+    randoInput.addEventListener("keydown", numeric)
+
+    function numeric (event){
+        
+        element = event.target;
+        let key = event.keyCode || event.charCode;
+        
+        if (isNaN(event.key)&&key !== 8&&key !== 46){
+            event.preventDefault();
+        } else {
+            element.addEventListener("keyup", ()=>{
+                buttonCheck(button, limitVal(), startStageUp);
+            }, { once:true });
+        };
+        buttonCheck(button, limitVal(), startStageUp);
+    };
+
+    function startStageUp(){
+        randoInput.removeEventListener("keydown", numeric);
+        emojiNum = randoInput.value;
+        // localStorage.setItem("eNumMaster", JSON.stringify(emojiNum));
+        emojiRandomizer(emojiNum);
+        stageUpFn();
+    };
+
 }
+
+function emojiRandomizer(eNum){
+    // let storedENum = JSON.parse(localStorage.getItem("eNumMaster"));
+    // if (storedENum!==null){
+    //     emojiNum = ~~storedENum;
+    // };
+    for (let i=0; i<eNum; i++){
+        let randoFn=()=>{
+            return Math.floor(Math.random()*emojiData.length);
+        };
+        let rando = randoFn();
+        while (eligibleEmojis.includes(emojiData[rando])){
+            rando=randoFn();
+        };
+        eligibleEmojis.push(emojiData[rando]);
+    };
+    // console.log(emojiNum+": "+eligibleEmojis.length);
+    for (let i=0; i<eligibleEmojis.length; i++){
+        eligibleEmojis[i]["index"]=i;
+    };
+    console.log(eligibleEmojis);
+    localStorage.setItem("eligibleMaster", JSON.stringify(eligibleEmojis));
+};
 
 
 function renderEmojis(){
+    let storedEligible = JSON.parse(localStorage.getItem("eligibleMaster"));
     let storedEmojis = JSON.parse(localStorage.getItem("emojisMaster"));
+    if (storedEligible!==null){
+        eligibleEmojis=storedEligible;
+    };
+    console.log(storedEligible)
     if (storedEmojis!==null){
         chosenEmojis=storedEmojis;
     };
-    let emojisContainer = document.createElement("div");
-    let emojiTitle = document.createElement("h3");
-    let fullUl = document.createElement("ul");
 
+
+    let emojiFloor=5;
+    let emojiCeiling=emojiFloor;
+    console.log(chosenEmojis.length)
+    let activeCheck = ()=>{
+        if (chosenEmojis.length<emojiFloor){
+            return false;
+        } else {
+            return true;
+        }
+    };
+
+    let codeGrab = (checkObj)=>{
+        if (typeof checkObj.htmlCode==="string"){
+            return checkObj.htmlCode;
+        } else {
+            return checkObj.htmlCode[0];
+        }
+    }
+
+    let eChoiceCard = document.createElement("div")
+    let emojiTitle = document.createElement("h3");
     let choiceBox = document.createElement("div");
     let button = document.createElement("div");
-    let emojiRules = document.createElement("h3");
     let choiceList = document.createElement("ul");
 
+    let gridCard = document.createElement("div");
+    let emojiRules = document.createElement("h3");
+    let emojisContainer = document.createElement("div");
+    let fullUl = document.createElement("ul");
+
+    
+    eChoiceCard.setAttribute("class", "eChoiceCard")
     choiceList.setAttribute("class", "emoji-choice-list");
     choiceBox.setAttribute("class", "emoji-choice-box");
-    fullUl.setAttribute("class", "fullUl");
-    emojisContainer.setAttribute("class", "emoji-container");
 
+    gridCard.setAttribute("class", "gridCard")
+    emojisContainer.setAttribute("class", "emoji-container");
+    fullUl.setAttribute("class", "fullUl");
+    
+    headerTitle.textContent = "Make Your Choice";
+    emojiTitle.textContent = "Which emojis call out to you?"
     button.textContent = "NEXT";
-    emojiRules.textContent = "Choose 3-7 Emojis"
-    headerTitle.textContent = "How are you feeling?";
-    emojiTitle.textContent = "Which emojis that best describe what mood you're in?"
+
+    emojiRules.textContent = "Choose 5 Emojis"
+    
 
     renderEmojiGrid();
     renderChoices();
     
 
     emojisContainer.appendChild(fullUl);
+    gridCard.appendChild(emojiRules);
+    gridCard.appendChild(emojisContainer)
     choiceBox.appendChild(choiceList);
-    baseCard.appendChild(emojiTitle);
-    baseCard.appendChild(emojisContainer);
-    baseCard.appendChild(emojiRules);
-    baseCard.appendChild(choiceBox);
-    baseCard.appendChild(button);
+    eChoiceCard.appendChild(emojiTitle);
+    eChoiceCard.appendChild(choiceBox);
+    eChoiceCard.appendChild(button);
+
+    baseCard.appendChild(eChoiceCard);
+    baseCard.appendChild(gridCard);
     
-    buttonCheck();
+    buttonCheck(button, activeCheck(), emojiButtonFn);
 
-    // button.addEventListener("click", buttonFn,{ once:true })
-
-    function buttonFn(){
+    function emojiButtonFn(){
         let gridList = document.getElementsByClassName("emojiGrid");
         let choiceSlots = document.getElementsByClassName("choiceSlot");
         for (let i=0; i<gridList.length; i++){
@@ -206,9 +248,8 @@ function renderEmojis(){
         for (let i=0; i<choiceSlots.length; i++){
             choiceSlots[i].removeEventListener("click", removeEmoji);
         };
-        renderInput();
-    }
-
+        stageUpFn();
+    };
 
     function renderEmojiGrid(){
         let n=0;
@@ -218,7 +259,7 @@ function renderEmojis(){
         // perfect square would produce overflow
         // Ref(1)
         let sqr = ()=>{
-            let intCheck = Math.sqrt(Emoji.instances.length)
+            let intCheck = Math.sqrt(eligibleEmojis.length)
             if (Number.isInteger(intCheck)){
                 return intCheck;
             }
@@ -226,13 +267,16 @@ function renderEmojis(){
                 return Math.floor(intCheck)+1;
             }; 
         };
-        let emojiRowRem = Emoji.instances.length%sqr();
+
+
+        console.log(eligibleEmojis.length)
+        let emojiRowRem = eligibleEmojis.length%sqr();
         // --(1)
         let emojiRowN = ()=>{
             if (emojiRowRem>0){
-                return ((Emoji.instances.length-emojiRowRem)/sqr())+1;
+                return ((eligibleEmojis.length-emojiRowRem)/sqr())+1;
             } else {
-                return ((Emoji.instances.length-emojiRowRem)/sqr());
+                return ((eligibleEmojis.length-emojiRowRem)/sqr());
             };
         };
 
@@ -246,15 +290,15 @@ function renderEmojis(){
         };
 
         
-        for (let i = 0; i < Emoji.instances.length; i++) {
+        for (let i = 0; i < eligibleEmojis.length; i++) {
             let li = document.createElement('li');
             let p = document.createElement('p');
             li.setAttribute("class", "emojiBox");
             
-            p.setAttribute("data-index", Emoji.instances[i].index);
+            p.setAttribute("data-index", eligibleEmojis[i].index);
             gridCheck(p, false);
             
-            p.textContent = Emoji.instances[i].emote;
+            p.innerHTML = codeGrab(eligibleEmojis[i]);
             if (subUls[n].childElementCount===sqr()){
                 emojiRows[n].appendChild(subUls[n]);
                 fullUl.appendChild(emojiRows[n]);
@@ -263,22 +307,12 @@ function renderEmojis(){
             li.appendChild(p);
             subUls[n].appendChild(li);
             let x=n+1;
-            if (x===emojiRowN()&&i+1===Emoji.instances.length){
+            if (x===emojiRowN()&&i+1===eligibleEmojis.length){
                 emojiRows[n].appendChild(subUls[n]);
                 fullUl.appendChild(emojiRows[n]);
             };
             // p.addEventListener("click", addEmoji, { once:true })
             emojiListener(p);
-        };
-    };
-
-    function buttonCheck(){
-        if (chosenEmojis.length<3){
-            button.setAttribute("class", "emoji-submit off");
-            button.removeEventListener("click", buttonFn);
-        } else {
-            button.setAttribute("class", "emoji-submit on");
-            button.addEventListener("click", buttonFn, { once:true });
         };
     };
 
@@ -298,7 +332,7 @@ function renderEmojis(){
             
             li.setAttribute("class", "emojiBox");
             p.setAttribute("class", "choiceSlot emojiImg on");
-            p.textContent = chosenEmojis[i].emote;
+            p.innerHTML = codeGrab(chosenEmojis[i]);
             li.appendChild(p);
             choiceList.appendChild(li);
             p.addEventListener("click", removeEmoji, { once:true });
@@ -310,9 +344,9 @@ function renderEmojis(){
         let emoji = null;
         element = event.target;
         
-        for (let i=0; i<Emoji.instances.length; i++){
-            if (~~element.dataset.index===Emoji.instances[i].index){
-                emoji=Emoji.instances[i];
+        for (let i=0; i<eligibleEmojis.length; i++){
+            if (~~element.dataset.index===eligibleEmojis[i].index){
+                emoji=eligibleEmojis[i];
             };
         };
         let storedEmojis = JSON.parse(localStorage.getItem("emojisMaster"));
@@ -324,7 +358,7 @@ function renderEmojis(){
         // check all children of parent to delete event listeners
         addDropChange();
         renderChoices();
-        buttonCheck();
+        buttonCheck(button, activeCheck(), emojiButtonFn);
     };
 
     function removeEmoji(event){
@@ -335,10 +369,10 @@ function renderEmojis(){
         };
         
         element = event.target;
-        for (let i=0; i<Emoji.instances.length; i++){
-            if (~~element.dataset.index===Emoji.instances[i].index){
+        for (let i=0; i<eligibleEmojis.length; i++){
+            if (~~element.dataset.index===eligibleEmojis[i].index){
                 
-                emoji=Emoji.instances[i];
+                emoji=eligibleEmojis[i];
             };
         };
         for (let i=0; i<chosenEmojis.length; i++){
@@ -349,7 +383,7 @@ function renderEmojis(){
         localStorage.setItem("emojisMaster", JSON.stringify(chosenEmojis));
         addDropChange()
         renderChoices();
-        buttonCheck();
+        buttonCheck(button, activeCheck(), emojiButtonFn);
     }
 
     function addDropChange(){
@@ -380,285 +414,59 @@ function renderEmojis(){
     };
 
     function emojiListener(element){
-        if (element.dataset.active==="true"&&chosenEmojis.length<7){
+        if (element.dataset.active==="true"&&chosenEmojis.length<emojiCeiling){
             element.addEventListener("click", addEmoji, { once:true });
         } else {
             element.removeEventListener("click", addEmoji);
         };
     };
-}
 
-// New Render with emojiData
-// function renderEmojis(){
-//     let storedEmojis = JSON.parse(localStorage.getItem("emojisMaster"));
-//     if (storedEmojis!==null){
-//         chosenEmojis=storedEmojis;
-//     };
-//     let emojisContainer = document.createElement("div");
-//     let emojiTitle = document.createElement("h3");
-//     let fullUl = document.createElement("ul");
-
-//     let choiceBox = document.createElement("div");
-//     let button = document.createElement("div");
-//     let emojiRules = document.createElement("h3");
-//     let choiceList = document.createElement("ul");
-
-//     choiceList.setAttribute("class", "emoji-choice-list");
-//     choiceBox.setAttribute("class", "emoji-choice-box");
-//     fullUl.setAttribute("class", "fullUl");
-//     emojisContainer.setAttribute("class", "emoji-container");
-
-//     button.textContent = "NEXT";
-//     emojiRules.textContent = "Choose 3-7 Emojis"
-//     headerTitle.textContent = "How are you feeling?";
-//     emojiTitle.textContent = "Which emojis that best describe what mood you're in?"
-
-//     renderEmojiGrid();
-//     renderChoices();
-    
-
-//     emojisContainer.appendChild(fullUl);
-//     choiceBox.appendChild(choiceList);
-//     baseCard.appendChild(emojiTitle);
-//     baseCard.appendChild(emojisContainer);
-//     baseCard.appendChild(emojiRules);
-//     baseCard.appendChild(choiceBox);
-//     baseCard.appendChild(button);
-    
-//     buttonCheck();
-
-//     // button.addEventListener("click", buttonFn,{ once:true })
-
-//     function buttonFn(){
-//         let gridList = document.getElementsByClassName("emojiGrid");
-//         let choiceSlots = document.getElementsByClassName("choiceSlot");
-//         for (let i=0; i<gridList.length; i++){
-//             gridList[i].removeEventListener("click", addEmoji);
-//         };
-//         for (let i=0; i<choiceSlots.length; i++){
-//             choiceSlots[i].removeEventListener("click", removeEmoji);
-//         };
-//         renderInput();
-//     }
-
-
-//     function renderEmojiGrid(){
-//         let n=0;
-//         let emojiRows = [];
-//         let subUls = [];
-//         // Add conditions in case of perfect square, because the +1 in
-//         // perfect square would produce overflow
-//         // Ref(1)
-//         let sqr = ()=>{
-//             let intCheck = Math.sqrt(emojiData.length)
-//             if (Number.isInteger(intCheck)){
-//                 return intCheck;
-//             }
-//             else{
-//                 return Math.floor(intCheck)+1;
-//             }; 
-//         };
-//         let emojiRowRem = emojiData.length%sqr();
-//         // --(1)
-//         let emojiRowN = ()=>{
-//             if (emojiRowRem>0){
-//                 return ((emojiData.length-emojiRowRem)/sqr())+1;
-//             } else {
-//                 return ((emojiData.length-emojiRowRem)/sqr());
-//             };
-//         };
-
-//         for (let i=0; i<emojiRowN(); i++){
-//             let li = document.createElement("li");
-//             let ul = document.createElement("ul");
-//             ul.setAttribute("class", "emoji-row");
-//             li.setAttribute("class", "emojiEl");
-//             emojiRows.push(li);
-//             subUls.push(ul);
-//         };
-
-        
-//         for (let i = 0; i < emojiData.length; i++) {
-//             let li = document.createElement('li');
-//             let p = document.createElement('p');
-//             li.setAttribute("class", "emojiBox");
-            
-//             p.setAttribute("data-index", emojiData[i].index);
-//             gridCheck(p, false);
-            
-//             p.textContent = emojiData[i].emote;
-//             if (subUls[n].childElementCount===sqr()){
-//                 emojiRows[n].appendChild(subUls[n]);
-//                 fullUl.appendChild(emojiRows[n]);
-//                 n++;
-//             };
-//             li.appendChild(p);
-//             subUls[n].appendChild(li);
-//             let x=n+1;
-//             if (x===emojiRowN()&&i+1===emojiData.length){
-//                 emojiRows[n].appendChild(subUls[n]);
-//                 fullUl.appendChild(emojiRows[n]);
-//             };
-//             // p.addEventListener("click", addEmoji, { once:true })
-//             emojiListener(p);
-//         };
-//     };
-
-//     function buttonCheck(){
-//         if (chosenEmojis.length<3){
-//             button.setAttribute("class", "emoji-submit off");
-//             button.removeEventListener("click", buttonFn);
-//         } else {
-//             button.setAttribute("class", "emoji-submit on");
-//             button.addEventListener("click", buttonFn, { once:true });
-//         };
-//     };
-
-//     function renderChoices(){
-//         let storedEmojis = JSON.parse(localStorage.getItem("emojisMaster"));
-//         if (storedEmojis!==null){
-//             chosenEmojis=storedEmojis;
-//         };
-//         choiceList.innerHTML='';
-//         for (let i=0; i<chosenEmojis.length; i++){
-//             let li = document.createElement("li");
-//             let p = document.createElement("p");
-//             // let emojiMatch = ()=>{
-
-//             // };
-//             p.setAttribute("data-index", chosenEmojis[i].index);
-            
-//             li.setAttribute("class", "emojiBox");
-//             p.setAttribute("class", "choiceSlot emojiImg on");
-//             p.textContent = chosenEmojis[i].emote;
-//             li.appendChild(p);
-//             choiceList.appendChild(li);
-//             p.addEventListener("click", removeEmoji, { once:true });
-            
-//         };
-//     };
-
-//     function addEmoji(event){
-//         let emoji = null;
-//         element = event.target;
-        
-//         for (let i=0; i<emojiData.length; i++){
-//             if (~~element.dataset.index===emojiData[i].index){
-//                 emoji=emojiData[i];
-//             };
-//         };
-//         let storedEmojis = JSON.parse(localStorage.getItem("emojisMaster"));
-//         if (storedEmojis!==null){
-//             chosenEmojis=storedEmojis;
-//         };
-//         chosenEmojis.push(emoji);
-//         localStorage.setItem("emojisMaster", JSON.stringify(chosenEmojis));
-//         // check all children of parent to delete event listeners
-//         addDropChange();
-//         renderChoices();
-//         buttonCheck();
-//     };
-
-//     function removeEmoji(event){
-//         let emoji = null;
-//         let storedEmojis = JSON.parse(localStorage.getItem("emojisMaster"));
-//         if (storedEmojis!==null){
-//             chosenEmojis=storedEmojis;
-//         };
-        
-//         element = event.target;
-//         for (let i=0; i<emojiData.length; i++){
-//             if (~~element.dataset.index===emojiData[i].index){
-                
-//                 emoji=emojiData[i];
-//             };
-//         };
-//         for (let i=0; i<chosenEmojis.length; i++){
-//             if (chosenEmojis[i].index===emoji.index){ 
-//                 chosenEmojis.splice(i, 1);
-//             };
-//         };
-//         localStorage.setItem("emojisMaster", JSON.stringify(chosenEmojis));
-//         addDropChange()
-//         renderChoices();
-//         buttonCheck();
-//     }
-
-//     function addDropChange(){
-//         let gridList = document.getElementsByClassName("emojiGrid");
-//         for (let i=0; i<gridList.length; i++){
-//             gridCheck(gridList[i], true);
-//         };
-//     };
-
-//     function gridCheck(element, isBundled){
-//         let isIncludes = false;
-//         for (let ix=0; ix<chosenEmojis.length; ix++){
-//             if (~~element.dataset.index===chosenEmojis[ix].index){
-//                     isIncludes=true;
-//                 }
-//         };
-//         if (isIncludes){
-//             element.setAttribute("data-active", "false");
-//             element.setAttribute("class", "emojiGrid emojiImg off");
-//         } else{
-//             element.setAttribute("data-active", "true");
-//             element.setAttribute("class", "emojiGrid emojiImg on");
-//         };
-
-//         if (isBundled){
-//             emojiListener(element)
-//         };
-//     };
-
-//     function emojiListener(element){
-//         if (element.dataset.active==="true"&&chosenEmojis.length<7){
-//             element.addEventListener("click", addEmoji, { once:true });
-//         } else {
-//             element.removeEventListener("click", addEmoji);
-//         };
-//     };
-// }
+};
 
 function renderInput(){
-    baseCard.innerHTML="";
     // let charN = 0;
     let inputBox = document.createElement("div");
     let userForm = document.createElement("form");
-    let question = document.createElement("label");
+    // let question = document.createElement("label");
+    let question = document.createElement("h3");
     let userInput = document.createElement("textarea");
     let charMax = document.createElement("p");
-    let inputButton = document.createElement("div");
+    let button = document.createElement("div");
     
-    userInput.setAttribute("maxLength", "500")
+    
 
-    // let inputBox = document.createElement("div");
-    // let userForm = document.createElement("form");
-    // let question = document.createElement("label");
-    // let userInput = document.createElement("textarea");
-    // let charMax = document.createElement("p");
-    // let inputButton = document.createElement("div");
+    inputBox.setAttribute("class", "inputBox");
+    charMax.setAttribute("class", "charMax");
+    userForm.setAttribute("class", "userForm");
+    // question.setAttribute("class", "question");
+    userInput.setAttribute("class", "userInput");
+    button.setAttribute("class", "emoji-submit");
 
+    userInput.setAttribute("maxLength", "500");
+    button.setAttribute("style", "align-self: end")
+
+    headerTitle.textContent="Time to Type"
     question.textContent = "What kind of movies are you into?"
     charMax.textContent = userInput.value.trim().length+"/"+userInput.maxLength+" Characters"
+    button.textContent = "NEXT"
 
     userForm.appendChild(question);
     userForm.appendChild(userInput);
     userForm.appendChild(charMax);
-    userForm.appendChild(inputButton);
+    userForm.appendChild(button);
     inputBox.appendChild(userForm);
     baseCard.appendChild(inputBox);
 
     userInput.addEventListener("keydown", charCounter);
 
-    function charCounter(){
+    function charCounter(event){
         if (~~~userInput.maxLength<=userInput.value.trim().length){
             charMax.textContent= userInput.value.trim().length+"/"+userInput.maxLength+" Characters";
             
         } else {
             let key = event.keyCode || event.charCode;
         
-            if ( key !== 8 && key !== 46 ){
+            if (key !== 8&&key !== 46){
                 console.log("coming soon.")
             };
         }

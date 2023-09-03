@@ -1,8 +1,9 @@
 :root{
-    --color1: rgb(180, 232, 180);
-    --color2: rgb(31, 31, 124);
+    --color1: #b4e8b4;
+    --color2: #1f1f7c;
     --color3: grey;
     --color4: whitesmoke;
+    --color5: #fc8eac;
     --shadow: rgb(0,0,0,0.5);
 
 }
@@ -21,7 +22,7 @@ header{
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 1rem;
+    padding: 1rem 1.5rem;
 }
 
 
@@ -30,7 +31,7 @@ h1{
 }
 
 .reset-button{
-    background-color: var(--color1);
+    background-color: var(--color5);
     font-size: 1.5rem;
     color: var(--color2);
     padding: .5rem 1rem;
@@ -41,7 +42,7 @@ h1{
 .reset-button:hover{
     cursor: pointer;
     /* border: 2px ridge black; */
-    box-shadow: 0 5px 5px 3px black;
+    box-shadow: 0 5px 5px 3px var(--shadow);
     margin-bottom: .125rem;
 }
 
@@ -49,7 +50,7 @@ h1{
     cursor: pointer;
     color: black;
     /* border: 2px ridge black; */
-    box-shadow: 0 3px 5px 2px black;
+    box-shadow: 0 3px 5px 2px var(--shadow);
     margin-bottom: .25rem;
 }
 
@@ -77,9 +78,11 @@ main{
 }
 
 .container-header{
-    background-color: var(--color3);
+    /* background-color: var(--color3); */
+    background-color: var(--color5);
+    color: var(--color4);
     display: flex;
-    justify-content: center;
+    justify-content: start;
     align-items: center;
     border-bottom: 2px solid black;
     padding: 1rem;
@@ -121,12 +124,13 @@ h3{
 }
 
 .emoji-submit.on{
-    background-color: var(--color1);
+    background-color: var(--color5);
+    box-shadow: 2px 7px 5px 5px var(--shadow);
 }
 
 .emoji-submit.on:hover{
     cursor: pointer;
-    box-shadow: 0 0 10px yellow;
+    box-shadow: 0 5px 5px 3px var(--shadow);
 }
 
 .emoji-submit.on:active{
@@ -143,10 +147,12 @@ h3{
     display: flex;
     flex-direction: column;
     align-items: center;
-    margin-bottom: 1rem;
+    margin: 1rem 0;
 }
 
 .randoInput{
+    display: flex;
+    text-align: center;
     font-size: 1.5rem;
     margin-top: 1rem;
     margin-bottom: 1.5rem;
@@ -162,9 +168,29 @@ h3{
 
 
 /* Emoji Grid Styles */
+
+.eChoiceCard{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 3rem;
+    margin-top: 1rem;
+}
+
+.gridCard{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: .5rem;
+}
+
 .emoji-container{
     padding: 1rem;
-
+    max-height: 80vh;
+    max-width: 85vw;
+    overflow-y: scroll;
+    overflow-x: scroll;
 }
 
 .fullUl{
@@ -176,7 +202,7 @@ h3{
 .emoji-row{
     display: flex;
     flex-direction: row;
-    flex-wrap: wrap;
+    /* flex-wrap: wrap; */
     gap: 1rem;
 }
 
@@ -231,8 +257,48 @@ h3{
     min-height: 4.5rem;
     border: 2px solid black;
     margin-top: 1rem;
-    margin-bottom: 1rem;
+    margin-bottom: 1.5rem;
 }
 /* /Emoji Grid Styles */
+
+
+/* Input Page Styles */
+.inputBox{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+
+
+.userForm{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.userForm h3{
+    align-self: start;
+}
+
+.userInput{
+    display: flex;
+    font-size: 1.5;
+    padding: .5rem;
+    min-height: 20rem;
+    min-width: 50rem;
+    margin-top: 1rem;
+    margin-bottom: .25rem;
+}
+
+.charMax{
+    display: flex;
+    align-self: end;
+    margin-bottom: 2rem;
+
+}
+
+
+/* /Input Page Styles */
 
 
