@@ -9,6 +9,7 @@
 }
 
 body{
+    font-family: 'Kanit', sans-serif;
     /* background-color:darkgreen; */
     background-color:var(--color1);
     display: flex;
@@ -37,6 +38,7 @@ h1{
     padding: .5rem 1rem;
     /* border: 2px outset black; */
     box-shadow: 2px 7px 5px 5px var(--shadow);
+    border-radius: 25px;
 }
 
 .reset-button:hover{
@@ -80,9 +82,10 @@ main{
 .container-header{
     /* background-color: var(--color3); */
     background-color: var(--color5);
-    color: var(--color4);
+    /* color: var(--color4); */
+    color: var(--color2);
     display: flex;
-    justify-content: start;
+    justify-content: space-between;
     align-items: center;
     border-bottom: 2px solid black;
     padding: 1rem;
@@ -91,6 +94,29 @@ main{
 
 .container-h2{
     font-size: 2rem;
+}
+
+.color-box{
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 1rem;
+}
+
+.color-ul{
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: .5rem;
+}
+
+.color-li:hover{
+    cursor: pointer;
+    color: black;
+}
+
+.color-li:active{
+    color: inherit;
 }
 
 .base-card{
@@ -120,10 +146,12 @@ h3{
 .emoji-submit{
     border: 2px outset black;
     font-size: 1.5rem;
-    padding: 1rem 2rem;
+    padding: .5rem 2.5rem;
+    border-radius: 40px;
 }
 
 .emoji-submit.on{
+    color: var(--color2);
     background-color: var(--color5);
     box-shadow: 2px 7px 5px 5px var(--shadow);
 }

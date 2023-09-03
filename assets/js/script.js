@@ -1,8 +1,50 @@
+let rootEl = document.querySelector(":root");
+let bodyEl = document.querySelector("#body");
+let stopEl = document.querySelector("#stop");
+let pauseEl = document.querySelector("#pause");
+let playEl = document.querySelector("#play");
+
+class ColorVar {
+    static instances = [];
+    constructor(label, oCode){
+        this.label = label
+        this.oCode = oCode;
+        ColorVar.instances.push(this);
+    }
+    changeFn(){
+        let rVal = ()=>{
+            return Math.floor(Math.random()*255);
+         };
+        let r = rVal();
+        let g = rVal();
+        let b = rVal();
+        // let clrs = [r,g,b];
+        
+        // console.log(rVal())
+        // for (let i=0; i<clrs.length; i++){
+        //     clrs[i] = rVal();
+        //     console.log(clrs[i])
+        // };
+        let clrCode = "rgb("+r+","+g+","+b+")";
+        // console.log(clrCode)
+        rootEl.style.setProperty(this.label, clrCode);
+    };
+    cResetFn(){
+        rootEl.style.setProperty(this.label, this.oCode);
+    };
+};
+
+const color1 = new ColorVar("--color1", "#b4e8b4");
+const color2 = new ColorVar("--color2", "#1f1f7c");
+const color3 = new ColorVar("--color5", "#fc8eac");
+
+
 let chosenEmojis = [];
 let eligibleEmojis = [];
 // let emojiNum = 0;
 let stage = 0;
 let stageArray = [renderStart, renderEmojis, renderInput];
+
 
 
 let container = document.querySelector("#container");
@@ -11,13 +53,38 @@ let headerTitle = document.querySelector("#container-h2");
 let baseCard = document.querySelector("#base-card");
 let resetButton = document.querySelector("#reset-button");
 
+// bodyEl.addEventListener("click", colorChange);
+stopEl.addEventListener("click",()=>{
+    for (let i=0; i<ColorVar.instances.length; i++){
+        ColorVar.instances[i].cResetFn();
+        bodyEl.removeEventListener("click", colorChange);
+    };
+})
+pauseEl.addEventListener("click",()=>{
+    for (let i=0; i<ColorVar.instances.length; i++){
+        bodyEl.removeEventListener("click", colorChange);
+    };
+});
+playEl.addEventListener("click",()=>{
+    for (let i=0; i<ColorVar.instances.length; i++){
+        bodyEl.addEventListener("click", colorChange);
+    };
+});
+
 resetButton.addEventListener("click", resetButtonFn);
+
 
 // renderEmojis();
 
-stageFunction()
+stageFunction();
 
 // Misc. FUnctions
+function colorChange(){
+    for (let i=0; i<ColorVar.instances.length; i++){
+        ColorVar.instances[i].changeFn();
+    };
+};
+
 function stageFunction(){
     let storedStage = JSON.parse(localStorage.getItem("stageMaster"));
     if (storedStage !== null){
@@ -55,7 +122,6 @@ function resetButtonFn(){
 };
 
 function buttonCheck(element, condition, fn){
-    console.log(condition)
     if (!condition){
         element.setAttribute("class", "emoji-submit off");
         element.removeEventListener("click", fn);
@@ -102,7 +168,7 @@ function renderStart(){
     emptyBox.setAttribute("class", "emptyBox");
 
     headerTitle.textContent = "Start";
-    randoTitle.textContent = "Choose the number of Emojis choices you want."
+    randoTitle.textContent = "Choose the number of Emoji choices you want."
     button.textContent = "NEXT";
 
     buttonCheck(button, limitVal());
