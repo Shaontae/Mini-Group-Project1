@@ -128,7 +128,9 @@ align-items: center;
 /* margin: 20%; */
 /* padding-left: 0%; */
 /* background-color: chartreuse; */
-background-color: var(--color4);
+background: rgb(42, 42, 42);
+color: var(--color4);
+/* background-color: var(--color4); */
 flex-grow: 1;
 padding: 1rem;
 }
@@ -206,6 +208,19 @@ h3{
     margin-top: 1rem;
 }
 
+.emoji-choice-box{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-width: 29rem;
+    min-height: 4.5rem;
+    border: 2px solid black;
+    margin-top: 1rem;
+    margin-bottom: 1.5rem;
+    background-color: var(--color3);
+    border: 2px ridge black;
+}
+
 .gridCard{
     display: flex;
     flex-direction: column;
@@ -219,6 +234,11 @@ h3{
     max-width: 85vw;
     overflow-y: scroll;
     overflow-x: scroll;
+    border: 2px ridge black;
+    /* background: rgb(76, 76, 76); */
+    /* background: rgb(42, 42, 42); */
+    /* background: var(--color4); */
+    background-color: var(--color3);
 }
 
 .fullUl{
@@ -256,6 +276,7 @@ h3{
     -webkit-user-select: none;
     -ms-user-select: none;
     user-select: none;
+    text-shadow: 0 0 7px var(--shadow);
 }
 
 .emojiImg.off{
@@ -277,16 +298,7 @@ h3{
     background-color: transparent;
 } */
 
-.emoji-choice-box{
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    min-width: 29rem;
-    min-height: 4.5rem;
-    border: 2px solid black;
-    margin-top: 1rem;
-    margin-bottom: 1.5rem;
-}
+
 /* /Emoji Grid Styles */
 
 
@@ -317,6 +329,13 @@ h3{
     min-width: 50rem;
     margin-top: 1rem;
     margin-bottom: .25rem;
+    background: var(--color3);
+    color: var(--color4);
+    border-radius: 2px;
+}
+
+.userInput:focus{
+    outline: 2px ridge var(--color4);
 }
 
 .charMax{
