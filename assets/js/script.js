@@ -540,6 +540,10 @@ function renderInput(){
     
 };
 
+function keywordExtractor(){
+    
+}
+
 // fetch("https://emojihub.yurace.pro/api/all")
 //     .then((response)=>{
 //         if (response.status===200){
