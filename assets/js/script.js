@@ -18,15 +18,7 @@ class ColorVar {
         let r = rVal();
         let g = rVal();
         let b = rVal();
-        // let clrs = [r,g,b];
-        
-        // console.log(rVal())
-        // for (let i=0; i<clrs.length; i++){
-        //     clrs[i] = rVal();
-        //     console.log(clrs[i])
-        // };
         let clrCode = "rgb("+r+","+g+","+b+")";
-        // console.log(clrCode)
         rootEl.style.setProperty(this.label, clrCode);
     };
     cResetFn(){
@@ -41,6 +33,8 @@ const color3 = new ColorVar("--color5", "#fc8eac");
 
 let chosenEmojis = [];
 let eligibleEmojis = [];
+let keywordsRaw = [];
+let bugWords = ["CHRISTMAS", "SANTA", "ASIAN", "CHINESE"];
 // let emojiNum = 0;
 let stage = 0;
 let stageArray = [renderStart, renderEmojis, renderInput];
@@ -139,6 +133,63 @@ function stageUpFn(){
     stageFunction();
 };
 
+function wordParser(str){
+    let storedKeywords = JSON.parse(localStorage.getItem("keywordsMaster"));
+    if (storedKeywords !== null){
+        keywordsRaw = storedKeywords;
+    };
+    // let tempArray = str.split(/\s/gi);
+    let tempArray = str.split(" ");
+    for (let i=0; i<tempArray.length; i++){
+        // let word = tempArray[i]
+        // console.log(word)
+        let punFn = (word)=>{
+            let newWord = "";
+            for (let n=0; n<word.length; n++){
+                if (word[n]!=="."&&word[n]!==","){
+                    newWord+=word[n];
+                };
+            };
+            return newWord;
+        };
+        tempArray[i] = punFn(tempArray[i]);
+        if (bugWords.includes(tempArray[i].toUpperCase())){
+            keywordsRaw.push(tempArray[i].toUpperCase());
+        } else{
+            if (!keywordsRaw.includes(tempArray[i].toUpperCase())&&!stopwordsData.includes(tempArray[i].toLowerCase())&&!tempArray[i].includes("type-")&&!tempArray.includes("≊")){
+                fetch("https://api.dictionaryapi.dev/api/v2/entries/en/"+tempArray[i])
+                .then((response)=>{
+                    if (response.status ===200){
+                        return response.json()
+                    };
+                    
+                })
+                .then((data)=>{
+                    // console.log(data)
+                    if (data!==undefined){
+                        let iLimit = 0;
+                        keywordsRaw.push(tempArray[i].toUpperCase());
+                        for (let n=0; n<data[0].meanings.length; n++){
+                            for (let x=0; x<data[0].meanings[n].synonyms.length; x++){
+                                let shortenedEx = data[0].meanings[n].synonyms[x];
+                                if (iLimit<5&&!keywordsRaw.includes(shortenedEx)){
+                                    keywordsRaw.push(shortenedEx.toUpperCase());
+                                    iLimit++;
+                                };
+                            };
+                        };
+                    };
+                })
+            };
+        }
+        
+    };
+    // Promise.all(keywordsRaw).then(()=>{
+    //     console.log(keywordsRaw);
+    // });
+
+};
+
 
 // Render Functions
 
@@ -221,11 +272,9 @@ function emojiRandomizer(eNum){
         };
         eligibleEmojis.push(emojiData[rando]);
     };
-    // console.log(emojiNum+": "+eligibleEmojis.length);
     for (let i=0; i<eligibleEmojis.length; i++){
         eligibleEmojis[i]["index"]=i;
     };
-    console.log(eligibleEmojis);
     localStorage.setItem("eligibleMaster", JSON.stringify(eligibleEmojis));
 };
 
@@ -236,7 +285,6 @@ function renderEmojis(){
     if (storedEligible!==null){
         eligibleEmojis=storedEligible;
     };
-    console.log(storedEligible)
     if (storedEmojis!==null){
         chosenEmojis=storedEmojis;
     };
@@ -244,7 +292,6 @@ function renderEmojis(){
 
     let emojiFloor=5;
     let emojiCeiling=emojiFloor;
-    console.log(chosenEmojis.length)
     let activeCheck = ()=>{
         if (chosenEmojis.length<emojiFloor){
             return false;
@@ -306,6 +353,7 @@ function renderEmojis(){
     buttonCheck(button, activeCheck(), emojiButtonFn);
 
     function emojiButtonFn(){
+        
         let gridList = document.getElementsByClassName("emojiGrid");
         let choiceSlots = document.getElementsByClassName("choiceSlot");
         for (let i=0; i<gridList.length; i++){
@@ -314,6 +362,14 @@ function renderEmojis(){
         for (let i=0; i<choiceSlots.length; i++){
             choiceSlots[i].removeEventListener("click", removeEmoji);
         };
+        
+        for (let i=0; i<chosenEmojis.length; i++){
+            wordParser(chosenEmojis[i].name);
+            wordParser(chosenEmojis[i].group);
+        };
+        Promise.all(keywordsRaw).then(()=>{
+            console.log(keywordsRaw);
+        });
         stageUpFn();
     };
 
@@ -335,7 +391,7 @@ function renderEmojis(){
         };
 
 
-        console.log(eligibleEmojis.length)
+        
         let emojiRowRem = eligibleEmojis.length%sqr();
         // --(1)
         let emojiRowN = ()=>{
@@ -539,10 +595,6 @@ function renderInput(){
     }
     
 };
-
-function keywordExtractor(){
-    
-}
 
 // fetch("https://emojihub.yurace.pro/api/all")
 //     .then((response)=>{
@@ -749,8 +801,13 @@ let omdbUrl = "http://www.omdbapi.com/?apikey=1aa15ab1&type=movie&plot=full&s=$c
 
 
 
-// fetch("https://api.dictionaryapi.dev/api/v2/entries/en/tug")
-//     .then((response)=>{return response.json()})
+// fetch("https://api.dictionaryapi.dev/api/v2/entries/en/punch")
+//     .then((response)=>{
+//         if (response.status ===200){
+//             return response.json()
+//         };
+        
+//         })
 //     .then((data)=>{console.log(data)})
 
 
