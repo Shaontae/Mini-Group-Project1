@@ -6,30 +6,62 @@ let playEl = document.querySelector("#play");
 
 class ColorVar {
     static instances = [];
-    constructor(label, oCode){
-        this.label = label
+    constructor(label, oCode) {
+        this.label = label;
         this.oCode = oCode;
         ColorVar.instances.push(this);
+        this.paused = false; // Add a 'paused' property to track the pause state
     }
-    changeFn(){
-        let rVal = ()=>{
-            return Math.floor(Math.random()*255);
-         };
+    changeFn() {
+        if (this.paused) return; // Check if the color change is paused
+        let rVal = () => {
+            return Math.floor(Math.random() * 255);
+        };
         let r = rVal();
         let g = rVal();
         let b = rVal();
-        let clrCode = "rgb("+r+","+g+","+b+")";
-        rootEl.style.setProperty(this.label, clrCode);
-    };
-    cResetFn(){
-        rootEl.style.setProperty(this.label, this.oCode);
-    };
-};
+        let clrCode = "rgb(" + r + "," + g + "," + b + ")";
+        document.body.style.setProperty(this.label, clrCode);
+    }
+    cResetFn() {
+        document.body.style.setProperty(this.label, this.oCode);
+    }
+    togglePause() {
+        this.paused = !this.paused; // Toggle the 'paused' state
+    }
+}
 
 const color1 = new ColorVar("--color1", "#b4e8b4");
 const color2 = new ColorVar("--color2", "#1f1f7c");
 const color3 = new ColorVar("--color5", "#fc8eac");
 
+const colorSwitch = document.getElementById('colorSwitch');
+const pauseButton = document.getElementById('pauseButton'); // Add a pause button
+const pauseLabel = document.getElementById('pauseLabel');
+
+colorSwitch.addEventListener('change', () => {
+    if (colorSwitch.checked) {
+        // Show the pause button and label using Tailwind CSS classes
+        pauseLabel.classList.remove('hidden');
+        pauseButton.classList.remove('hidden');
+        document.body.addEventListener('click', () => {
+            ColorVar.instances.forEach(colorVar => colorVar.changeFn());
+        });
+    } else {
+        ColorVar.instances.forEach(colorVar => colorVar.cResetFn());
+        document.body.removeEventListener('click', () => {
+            ColorVar.instances.forEach(colorVar => colorVar.changeFn());
+        });
+        // Hide the pause button and label using Tailwind CSS classes
+        pauseLabel.classList.add('hidden');
+        pauseButton.classList.add('hidden');
+    }
+});
+
+pauseButton.addEventListener('click', () => {
+    // Toggle the pause state for all ColorVar instances
+    ColorVar.instances.forEach(colorVar => colorVar.togglePause());
+});
 
 let chosenEmojis = [];
 let eligibleEmojis = [];
@@ -47,23 +79,23 @@ let headerTitle = document.querySelector("#container-h2");
 let baseCard = document.querySelector("#base-card");
 let resetButton = document.querySelector("#reset-button");
 
-// bodyEl.addEventListener("click", colorChange);
-stopEl.addEventListener("click",()=>{
-    for (let i=0; i<ColorVar.instances.length; i++){
-        ColorVar.instances[i].cResetFn();
-        bodyEl.removeEventListener("click", colorChange);
-    };
-})
-pauseEl.addEventListener("click",()=>{
-    for (let i=0; i<ColorVar.instances.length; i++){
-        bodyEl.removeEventListener("click", colorChange);
-    };
-});
-playEl.addEventListener("click",()=>{
-    for (let i=0; i<ColorVar.instances.length; i++){
-        bodyEl.addEventListener("click", colorChange);
-    };
-});
+// // bodyEl.addEventListener("click", colorChange);
+// stopEl.addEventListener("click",()=>{
+//     for (let i=0; i<ColorVar.instances.length; i++){
+//         ColorVar.instances[i].cResetFn();
+//         bodyEl.removeEventListener("click", colorChange);
+//     };
+// })
+// pauseEl.addEventListener("click",()=>{
+//     for (let i=0; i<ColorVar.instances.length; i++){
+//         bodyEl.removeEventListener("click", colorChange);
+//     };
+// });
+// playEl.addEventListener("click",()=>{
+//     for (let i=0; i<ColorVar.instances.length; i++){
+//         bodyEl.addEventListener("click", colorChange);
+//     };
+// });
 
 resetButton.addEventListener("click", resetButtonFn);
 
