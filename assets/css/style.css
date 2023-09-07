@@ -12,23 +12,18 @@ body{
     font-family: 'Kanit', sans-serif;
     /* background-color:darkgreen; */
     background-color:var(--color1);
-    display: flex;
-    flex-direction: column;
-    min-height: 100vh;
+
 }
 
 header{
     background-color: var(--color2);
     color: var(--color1);
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 1rem 1.5rem;
+    
 }
 
 
 h1{
- font-size: 3rem;
+
 }
 
 .reset-button{
@@ -57,23 +52,18 @@ h1{
 }
 
 main{
-    display: flex;
-    justify-content: center;
-    align-items: start;
-    padding: 2rem 4rem;
+    
     /* min-height: 100vh; */
-    flex-grow: 1;
+   
 }
 
 .container{
    /* position: relative; */
-   display: flex;
-   flex-direction: column;
+   
    /* align-items: center;
    justify-content: center; */
    /* padding: 1rem; */
-   border: 2px solid black;
-   flex-grow: 1;
+   
    /* max-width: 80%; */
    /* min-height: 100%; */
    /* height: 80vh; */
@@ -84,30 +74,20 @@ main{
     background-color: var(--color5);
     /* color: var(--color4); */
     color: var(--color2);
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    border-bottom: 2px solid black;
-    padding: 1rem;
+    
 
 }
 
 .container-h2{
-    font-size: 2rem;
+    
 }
 
 .color-box{
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    gap: 1rem;
+
 }
 
 .color-ul{
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    gap: .5rem;
+    
 }
 
 .color-li:hover{
@@ -122,17 +102,14 @@ main{
 .base-card{
 /* box-sizing: border-box;
 position: relative; */
-display: flex;
-flex-direction: column;
-align-items: center;
+
 /* margin: 20%; */
 /* padding-left: 0%; */
 /* background-color: chartreuse; */
 background: rgb(42, 42, 42);
 color: var(--color4);
 /* background-color: var(--color4); */
-flex-grow: 1;
-padding: 1rem;
+
 }
 
 h3{
