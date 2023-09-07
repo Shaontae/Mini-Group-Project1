@@ -67,6 +67,7 @@ let chosenEmojis = [];
 let eligibleEmojis = [];
 let keywordsRaw = [];
 let keywordSluice = [];
+let keywordsTrash = [];
 let errorLogs = [];
 let bugWords = ["CHRISTMAS", "SANTA", "ASIAN", "CHINESE", "JAPANESE"];
 // let emojiNum = 0;
@@ -167,7 +168,7 @@ function stageUpFn(){
     stageFunction();
 };
 
-function wordParser(str){
+async function wordParser(str){
     let keywordsFloat = [];
     // let promisesFloat = [];
     let storedKeywords = JSON.parse(localStorage.getItem("keywordsMaster"));
@@ -189,12 +190,14 @@ function wordParser(str){
     for (let i=0; i<splitArray.length; i++){
         splitArray[i] = puncFn(splitArray[i]);
         if (bugWords.includes(splitArray[i].toUpperCase())){
-            keywordsRaw.push(splitArray[i].toUpperCase());
+            keywordSluice.push(splitArray[i].toUpperCase());
         } else {
             if (!keywordsRaw.includes(splitArray[i].toUpperCase())&&!stopwordsData.includes(splitArray[i].toLowerCase())&&!splitArray[i].includes("type-")&&!splitArray.includes("≊")){
                 keywordsFloat.push(splitArray[i])
                 // promisesFloat.push(fetch("https://api.dictionaryapi.dev/api/v2/entries/en/"+splitArray[i]))
-            };
+            } else {
+                keywordsTrash.push(splitArray[i])
+            }
         };
     };
     let promisesFloat = keywordsFloat.map(r => fetch("https://api.dictionaryapi.dev/api/v2/entries/en/"+r).then((result)=>{
@@ -219,7 +222,7 @@ function wordParser(str){
     // console.log(keywordsFloat)
     // console.log(promisesFloat)
 
-    Promise.allSettled(promisesFloat).then((response)=>{
+    const waitTest = await Promise.allSettled(promisesFloat).then((response)=>{
         // console.log(response)
         let dataResult = [];
         // console.log(promisesFloat)
@@ -237,7 +240,7 @@ function wordParser(str){
         for (let i=0; i<response.length; i++){
             if (response[i].value[0][0]==="error"){
                 response.splice(i, 1);
-            } else{
+            } else {
                 
                 // console.log(shortcut)
                 // console.log("break")
@@ -258,7 +261,8 @@ function wordParser(str){
                     };
                 };
             };
-        }).then(()=>(console.log(keywordSluice)))
+        })
+        // .then(()=>(console.log(keywordSluice)))
         // console.log(response)
         // console.log(floatArray)
         // let tempArray=[];
@@ -275,7 +279,6 @@ function wordParser(str){
         // };
         // return tempArray;
     })
-    console.log(keywordSluice)
 //     .then((data)=>{
 //         for (let i=0; i<data.length; i++){
 //             let iLimit = 0;
@@ -290,6 +293,19 @@ function wordParser(str){
 //     }).then(()=>{
 //         console.log(keywordsRaw.length)
 //     })
+};
+
+function keywordSifter(){
+    for (let i=0; i<keywordSluice.length; i++){
+        console.log(keywordsRaw.includes(keywordSluice[i]))
+        if (!keywordsRaw.includes(keywordSluice[i])){
+            keywordsRaw.push(keywordSluice[i]);
+        } else {
+            keywordsTrash.push(keywordSluice[i]);
+        };
+    };
+    keywordSluice=[];
+    localStorage.setItem("keywordsMaster", JSON.stringify(keywordsRaw));
 };
 
 // function wordParser(str){
@@ -511,7 +527,7 @@ function renderEmojis(){
     
     buttonCheck(button, activeCheck(), emojiButtonFn);
 
-    function emojiButtonFn(){
+    async function emojiButtonFn(){
         
         let gridList = document.getElementsByClassName("emojiGrid");
         let choiceSlots = document.getElementsByClassName("choiceSlot");
@@ -523,9 +539,14 @@ function renderEmojis(){
         };
         
         for (let i=0; i<chosenEmojis.length; i++){
-            wordParser(chosenEmojis[i].name);
-            wordParser(chosenEmojis[i].group);
+            const wait1 = await wordParser(chosenEmojis[i].name);
+            const wait2 = await wordParser(chosenEmojis[i].group);
         };
+        console.log(errorLogs)
+        console.log(keywordSluice)
+        keywordSifter();
+        console.log(keywordsRaw)
+        console.log(keywordsTrash)
         stageUpFn();
     };
 
