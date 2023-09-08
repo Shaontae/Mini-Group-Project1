@@ -1044,3 +1044,317 @@ testFn();
 // };
 // movieFetch("##Your Movie");
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+function fetchTMDB() {
+    fetch("https://api.themoviedb.org/3/movie/1491?api_key=654175309f8dda54d6e0ea0c7706fa04&language=en-US")
+      .then((response) => {
+        if (response.status === 200) {
+          return response.json();
+        } else {
+          throw new Error("Failed to fetch data from TMDb");
+        }
+      })
+      .then((data) => {
+        renderTMDB(data); // Call the renderTMDB function with the fetched data
+      })
+      .catch((error) => {
+        console.error(error);
+      });
+  }
+  
+  function renderTMDB(movieData) {
+    let { title, poster_path, overview } = movieData;
+    //this is the base url for all posters... it adds poster_path data to the end and grabs the poster for the movie
+    let basePosterURL = 'https://image.tmdb.org/t/p/w500';
+    let tmdbContainer = document.createElement('div');
+    document.body.appendChild(tmdbContainer); // Append to the document body
+  
+    tmdbContainer.classList.add('container', 'movie');
+    tmdbContainer.innerHTML = `
+      <img src="${basePosterURL + poster_path}" alt="${title}">
+      <div class='movie-title'>
+        <h1>${title}</h1>
+      </div>
+      <div class="overview">
+        <h2>Plot</h2>
+        ${overview}
+      </div>
+    `;
+  }
+
+
+
