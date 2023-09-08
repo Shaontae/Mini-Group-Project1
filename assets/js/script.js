@@ -108,7 +108,7 @@ let keywordsRaw = [];
 let keywordSluice = [];
 let keywordsTrash = [];
 let errorLogs = [];
-let bugWords = ["CHRISTMAS", "SANTA", "ASIAN", "CHINESE", "JAPANESE"];
+let bugWords = ["CHRISTMAS", "SANTA", "ASIAN", "CHINESE", "JAPANESE", "SNOWBOARDER"];
 // let emojiNum = 0;
 let stage = 0;
 let stageArray = [renderStart, renderEmojis, renderInput];
@@ -218,6 +218,10 @@ async function wordParser(str){
         keywordsRaw = storedKeywords;
     };
 
+    let primaryArray = keywordsRaw.map((kwObj)=>{
+        return kwObj.primary;
+    })
+
     let puncFn = (word)=>{
         let newWord = "";
         for (let n=0; n<word.length; n++){
@@ -232,12 +236,14 @@ async function wordParser(str){
     for (let i=0; i<splitArray.length; i++){
         splitArray[i] = puncFn(splitArray[i]);
         if (bugWords.includes(splitArray[i].toUpperCase())){
-            keywordSluice.push(splitArray[i].toUpperCase());
+            let keywordObj = createKWObj(splitArray[i]);
+            // keywordSluice.push(splitArray[i].toUpperCase());
+            keywordSluice.push(keywordObj);
         } else {
-            if (!keywordsRaw.includes(splitArray[i].toUpperCase())&&!stopwordsData.includes(splitArray[i].toLowerCase())&&!splitArray[i].includes("type-")&&!splitArray.includes("≊")){
-                keywordsFloat.push(splitArray[i])
+            if (!primaryArray.includes(splitArray[i].toUpperCase())&&!stopwordsData.includes(splitArray[i].toLowerCase())&&!splitArray[i].includes("type-")&&!splitArray.includes("≊")){
+                keywordsFloat.push(splitArray[i]);
             } else {
-                keywordsTrash.push(splitArray[i])
+                keywordsTrash.push(splitArray[i]);
             }
         };
     };
@@ -256,8 +262,6 @@ async function wordParser(str){
             };
         }))
 
-    // console.log(promisesFloat)
-
     const waitTest = await Promise.allSettled(promisesFloat).then((response)=>{
         let results = response.filter((el)=>{
             if (el.value==="error"){
@@ -265,64 +269,69 @@ async function wordParser(str){
             } else {
                 return true;
             };
-        })
-        // console.log(results)
-        for (let i=0; i<results.length; i++){    
-            for (let n=0; n<results[i].value[0].meanings.length; n++){
-                let iLimit = 0;
-                let shortcut = results[i].value[0].meanings[n]
-                if (iLimit<5){
-                    for (let x=0; x< shortcut.synonyms.length; x++){
-                        if (iLimit<5){
-                            keywordSluice.push(shortcut.synonyms[x]);
-                            iLimit++;
-                            // console.log(results[i].value[0].word+": "+shortcut.synonyms[x]+" "+iLimit);
-                        } else {
-                            break
-                        }
-                    };
+        });
+        let kwObjsFloat = results.map((obj)=>{
+            let newObj = createKWObj(obj.value[0].word);
+            return newObj;
+        });
+
+        for (let i=0; i<results.length; i++){
+            let synTest =0;
+            let synsFloat = [];
+            let currentObj= objMatch(results[i].value[0].word);
+            for (let x=0; x<results[i].value.length; x++){
+                for (let n=0; n<results[i].value[x].meanings.length; n++){
+                    synTest++;
+                    // console.log(results[i].value[0].word+": "+synTest+", "+results[i].value[x].meanings[n].synonyms)
+                    synsFloat=synsFloat.concat(results[i].value[x].meanings[n].synonyms);
+                };
+                if (synsFloat.length<5){
+                    currentObj.syns=synsFloat;
                 } else {
-                    console.log("Lotta loops here")
-                    break
-                }
-                
+                    let synsDump =[];
+                    while(synsDump.length<5){
+                        let randSyn = Math.floor(Math.random()*synsFloat.length);
+                        if (!synsDump.includes(synsFloat[randSyn])){
+                            synsDump.push(synsFloat[randSyn]);
+                        };
+                    };
+                    currentObj.syns=synsDump;
+                };
+            };
+            keywordSluice.push(currentObj);
+        };
+
+        function objMatch(word){
+            for (let i=0; i<kwObjsFloat.length; i++){
+                if (kwObjsFloat[i].primary===word){
+                    return kwObjsFloat[i];
+                };
             };
         };
     })
-    // console.log(waitTest)
-    
 
-    // const waitTest = await Promise.allSettled(promisesFloat).then((response)=>{
-    //     let dataResult = [];
-    //     for (let i=0; i<response.length; i++){
-    //         if (response[i].value[0][0]==="error"){
-    //             response.splice(i, 1);
-    //         } else {
-    //             dataResult.push(response[i].value[0])
-    //             keywordSluice.push(keywordsFloat[i])
-    //         }
-    //     }
-    //     Promise.allSettled(dataResult).then((results)=>{
-            // for (let i=0; i<results.length; i++){
-            //     let iLimit = 0;
-            //     for (let n=0; n<results[i].value[0].meanings.length; n++){
-            //         let shortcut = results[i].value[0].meanings[n]
-            //         for (let x=0; x< shortcut.synonyms.length; x++){
-            //             if (iLimit<5){
-            //                 keywordSluice.push(shortcut.synonyms[x]);
-            //             };
-            //         };
-            //     };
-            // };
-    //     })
-    // })
+    function createKWObj(word){
+        let wordObj={
+            primary: word,
+            syns: []
+        }
+        return wordObj
+    }
 };
 
 function keywordSifter(){
+    let primaryArray = keywordsRaw.map((kwObj)=>{
+        return kwObj.primary;
+    })
+    
     for (let i=0; i<keywordSluice.length; i++){
         // console.log(keywordsRaw.includes(keywordSluice[i])+": "+keywordSluice[i])
-        if (!keywordsRaw.includes(keywordSluice[i])){
+        if (!primaryArray.includes(keywordSluice[i].primary)){
             keywordsRaw.push(keywordSluice[i]);
+            primaryArray = keywordsRaw.map((kwObj)=>{
+                return kwObj.primary;
+            })
+            // console.log(primaryArray)
         } else {
             keywordsTrash.push(keywordSluice[i]);
         };

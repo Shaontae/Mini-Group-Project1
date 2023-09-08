@@ -183,6 +183,7 @@ h3{
     margin-top: 1rem;
     margin-bottom: 1.5rem;
     padding: .5rem;
+    background-color: var(--color3);
 }
 
 .emptyBox{
@@ -353,7 +354,7 @@ h3{
     align-items: center;
     justify-content: center;
     font-size: 5rem;
-    padding: 10rem 5rem;
+    padding: 15rem 5rem;
 }
 .staticDiv{
     display: flex;
