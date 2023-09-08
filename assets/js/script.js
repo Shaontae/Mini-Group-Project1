@@ -1,8 +1,10 @@
 let rootEl = document.querySelector(":root");
 let bodyEl = document.querySelector("#body");
-let stopEl = document.querySelector("#stop");
-let pauseEl = document.querySelector("#pause");
-let playEl = document.querySelector("#play");
+// let stopEl = document.querySelector("#stop");
+// let pauseEl = document.querySelector("#pause");
+// let playEl = document.querySelector("#play");
+let colorSwitchEl = document.querySelector("#colorSwitch");
+let playPauseEl = document.querySelector("#play-pause");
 
 class ColorVar {
     static instances = [];
@@ -35,33 +37,70 @@ const color1 = new ColorVar("--color1", "#b4e8b4");
 const color2 = new ColorVar("--color2", "#1f1f7c");
 const color3 = new ColorVar("--color5", "#fc8eac");
 
+colorSwitchEl.addEventListener("change", (box)=>{
+    
+    if (colorSwitchEl.checked){
+        colorChange()
+        
+        playPauseEl.setAttribute("class", "material-icons play-pause");
+        playPauseEl.textContent = "pause"
+
+        playPauseEl.addEventListener("click", playPauseFn);
+        bodyEl.addEventListener("click", colorChange);
+    } else {
+        for (let i=0; i<ColorVar.instances.length; i++){
+            ColorVar.instances[i].cResetFn();
+        };
+        playPauseEl.setAttribute("class", "material-icons play-pause nv");
+        playPauseEl.removeEventListener("click", playPauseFn);
+        bodyEl.removeEventListener("click", colorChange);
+    }
+})
+
+function playPauseFn(event){
+    let element = event.target
+    
+    if (element.dataset.state ==="play"){
+        
+        element.dataset.state = "pause"
+        bodyEl.removeEventListener("click", colorChange);
+        playPauseEl.textContent = "play_arrow";
+    } else {
+        element.dataset.state = "play"
+        bodyEl.addEventListener("click", colorChange);
+        playPauseEl.textContent = "pause";
+    }
+        
+}
+
+
 const colorSwitch = document.getElementById('colorSwitch');
 const pauseButton = document.getElementById('pauseButton'); // Add a pause button
 const pauseLabel = document.getElementById('pauseLabel');
 
-colorSwitch.addEventListener('change', () => {
-    if (colorSwitch.checked) {
-        // Show the pause button and label using Tailwind CSS classes
-        pauseLabel.classList.remove('hidden');
-        pauseButton.classList.remove('hidden');
-        document.body.addEventListener('click', () => {
-            ColorVar.instances.forEach(colorVar => colorVar.changeFn());
-        });
-    } else {
-        ColorVar.instances.forEach(colorVar => colorVar.cResetFn());
-        document.body.removeEventListener('click', () => {
-            ColorVar.instances.forEach(colorVar => colorVar.changeFn());
-        });
-        // Hide the pause button and label using Tailwind CSS classes
-        pauseLabel.classList.add('hidden');
-        pauseButton.classList.add('hidden');
-    }
-});
+// colorSwitch.addEventListener('change', () => {
+//     if (colorSwitch.checked) {
+//         // Show the pause button and label using Tailwind CSS classes
+//         pauseLabel.classList.remove('hidden');
+//         pauseButton.classList.remove('hidden');
+//         document.body.addEventListener('click', () => {
+//             ColorVar.instances.forEach(colorVar => colorVar.changeFn());
+//         });
+//     } else {
+//         ColorVar.instances.forEach(colorVar => colorVar.cResetFn());
+//         document.body.removeEventListener('click', () => {
+//             ColorVar.instances.forEach(colorVar => colorVar.changeFn());
+//         });
+//         // Hide the pause button and label using Tailwind CSS classes
+//         pauseLabel.classList.add('hidden');
+//         pauseButton.classList.add('hidden');
+//     }
+// });
 
-pauseButton.addEventListener('click', () => {
-    // Toggle the pause state for all ColorVar instances
-    ColorVar.instances.forEach(colorVar => colorVar.togglePause());
-});
+// pauseButton.addEventListener('click', () => {
+//     // Toggle the pause state for all ColorVar instances
+//     ColorVar.instances.forEach(colorVar => colorVar.togglePause());
+// });
 
 let chosenEmojis = [];
 let eligibleEmojis = [];
@@ -86,10 +125,10 @@ let resetButton = document.querySelector("#reset-button");
 
 // // bodyEl.addEventListener("click", colorChange);
 // stopEl.addEventListener("click",()=>{
-//     for (let i=0; i<ColorVar.instances.length; i++){
-//         ColorVar.instances[i].cResetFn();
-//         bodyEl.removeEventListener("click", colorChange);
-//     };
+    // for (let i=0; i<ColorVar.instances.length; i++){
+    //     ColorVar.instances[i].cResetFn();
+    //     bodyEl.removeEventListener("click", colorChange);
+    // };
 // })
 // pauseEl.addEventListener("click",()=>{
 //     for (let i=0; i<ColorVar.instances.length; i++){
@@ -97,9 +136,9 @@ let resetButton = document.querySelector("#reset-button");
 //     };
 // });
 // playEl.addEventListener("click",()=>{
-//     for (let i=0; i<ColorVar.instances.length; i++){
-//         bodyEl.addEventListener("click", colorChange);
-//     };
+    // for (let i=0; i<ColorVar.instances.length; i++){
+    //     bodyEl.addEventListener("click", colorChange);
+    // };
 // });
 
 resetButton.addEventListener("click", resetButtonFn);
