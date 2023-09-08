@@ -141,29 +141,29 @@ h3{
     /* gap: 1rem; */
 }
 
-.emoji-submit{
+.nextButton{
     border: 2px outset black;
     font-size: 1.5rem;
     padding: .5rem 2.5rem;
     border-radius: 40px;
 }
 
-.emoji-submit.on{
+.nextButton.on{
     color: var(--color2);
     background-color: var(--color5);
     box-shadow: 2px 7px 5px 5px var(--shadow);
 }
 
-.emoji-submit.on:hover{
+.nextButton.on:hover{
     cursor: pointer;
     box-shadow: 0 5px 5px 3px var(--shadow);
 }
 
-.emoji-submit.on:active{
+.nextButton.on:active{
     box-shadow: none;
 }
 
-.emoji-submit.off{
+.nextButton.off{
     background-color: rgb(94, 93, 93);
 }
 
