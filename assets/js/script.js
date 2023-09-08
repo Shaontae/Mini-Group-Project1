@@ -74,6 +74,8 @@ let bugWords = ["CHRISTMAS", "SANTA", "ASIAN", "CHINESE", "JAPANESE"];
 let stage = 0;
 let stageArray = [renderStart, renderEmojis, renderInput];
 
+let isLoading = false;
+
 
 
 let container = document.querySelector("#container");
@@ -137,12 +139,14 @@ function resetButtonFn(){
     // emojiNum = 0;
     chosenEmojis = [];
     eligibleEmojis = [];
+    keywordsRaw = [];
     
     
     localStorage.setItem("stageMaster", JSON.stringify(stage));
     // localStorage.setItem("eNumMaster", JSON.stringify(emojiNum));
     localStorage.setItem("emojisMaster", JSON.stringify(chosenEmojis));
     localStorage.setItem("eligibleMaster", JSON.stringify(eligibleEmojis));
+    localStorage.setItem("keywordsMaster", JSON.stringify(keywordsRaw));
 
 
     // call startupFunction
@@ -170,7 +174,6 @@ function stageUpFn(){
 
 async function wordParser(str){
     let keywordsFloat = [];
-    // let promisesFloat = [];
     let storedKeywords = JSON.parse(localStorage.getItem("keywordsMaster"));
     if (storedKeywords !== null){
         keywordsRaw = storedKeywords;
@@ -194,110 +197,91 @@ async function wordParser(str){
         } else {
             if (!keywordsRaw.includes(splitArray[i].toUpperCase())&&!stopwordsData.includes(splitArray[i].toLowerCase())&&!splitArray[i].includes("type-")&&!splitArray.includes("≊")){
                 keywordsFloat.push(splitArray[i])
-                // promisesFloat.push(fetch("https://api.dictionaryapi.dev/api/v2/entries/en/"+splitArray[i]))
             } else {
                 keywordsTrash.push(splitArray[i])
             }
         };
     };
-    let promisesFloat = keywordsFloat.map(r => fetch("https://api.dictionaryapi.dev/api/v2/entries/en/"+r).then((result)=>{
-        let tempArray=[];
-        if (result.status===200){
-            tempArray.push(result.json())
-        } else {
-            let storedErrors = JSON.parse(localStorage.getItem("errorsMaster"));
-            if (storedErrors!==null){
-                errorLogs = storedErrors;
-            }
-            errorLogs.push([r,result.status]);
-            tempArray.push(["error"]);
-            localStorage.setItem("errorsMaster", JSON.stringify(errorLogs));
-        }
-        return tempArray
-    }))
-    
-    // let promisesFloat = keywordsFloat.map(r => fetch("https://api.dictionaryapi.dev/api/v2/entries/en/"+r)
-    // .then((response)=>{console.log(response)})
-    // )
-    // console.log(keywordsFloat)
+    let promisesFloat = keywordsFloat.map(r => fetch("https://api.dictionaryapi.dev/api/v2/entries/en/"+r)
+        .then((result)=>{
+            if (result.status===200){
+                return result.json();
+            } else {
+                let storedErrors = JSON.parse(localStorage.getItem("errorsMaster"));
+                if (storedErrors!==null){
+                    errorLogs = storedErrors;
+                }
+                errorLogs.push([r,result.status]);
+                localStorage.setItem("errorsMaster", JSON.stringify(errorLogs));
+                return "error";
+            };
+        }))
+
     // console.log(promisesFloat)
 
     const waitTest = await Promise.allSettled(promisesFloat).then((response)=>{
-        // console.log(response)
-        let dataResult = [];
-        // console.log(promisesFloat)
-        // const asyncTest = await (async ()=>{
-        //     for (let i=0; i<response.length; i++){
-        //         if (response[i].value[0][0]==="error"){
-        //             response.splice(i, 1);
-        //         } else{
-        //             console.log("break")
-        //             floatArray.push(keywordsFloat[i])
-        //             // console.log(keywordsFloat)
-        //         }
-        //     }
-        // })();
-        for (let i=0; i<response.length; i++){
-            if (response[i].value[0][0]==="error"){
-                response.splice(i, 1);
+        let results = response.filter((el)=>{
+            if (el.value==="error"){
+                return false;
             } else {
-                
-                // console.log(shortcut)
-                // console.log("break")
-                dataResult.push(response[i].value[0])
-                keywordSluice.push(keywordsFloat[i])
-                // console.log(keywordsFloat)
-            }
-        }
-        Promise.allSettled(dataResult).then((results)=>{
-            for (let i=0; i<results.length; i++){
+                return true;
+            };
+        })
+        // console.log(results)
+        for (let i=0; i<results.length; i++){    
+            for (let n=0; n<results[i].value[0].meanings.length; n++){
                 let iLimit = 0;
-                for (let n=0; n<results[i].value[0].meanings.length; n++){
-                    let shortcut = results[i].value[0].meanings[n]
+                let shortcut = results[i].value[0].meanings[n]
+                if (iLimit<5){
                     for (let x=0; x< shortcut.synonyms.length; x++){
                         if (iLimit<5){
                             keywordSluice.push(shortcut.synonyms[x]);
-                        };
+                            iLimit++;
+                            // console.log(results[i].value[0].word+": "+shortcut.synonyms[x]+" "+iLimit);
+                        } else {
+                            break
+                        }
                     };
-                };
+                } else {
+                    console.log("Lotta loops here")
+                    break
+                }
+                
             };
-        })
-        // .then(()=>(console.log(keywordSluice)))
-        // console.log(response)
-        // console.log(floatArray)
-        // let tempArray=[];
-        // for (let i=0; i<response.length; i++){
-        //     console.log(response[i].status)
-        //     if (response[i].status==="fulfilled"){
-        //         // console.log(keywordsRaw.includes(keywordsFloat[i]))
-        //         if (!keywordsRaw.includes(keywordsFloat[i])){
-        //             console.log("bub")
-        //             keywordsRaw.push(keywordsFloat[i])
-        //         };
-        //         tempArray.push(response[i].json());
-        //     };
-        // };
-        // return tempArray;
+        };
     })
-//     .then((data)=>{
-//         for (let i=0; i<data.length; i++){
-//             let iLimit = 0;
-//             for (let n=0; n<data[i][0].meanings.length; n++){
-//                 for (let x=0; x<data[i][0].meanings[n].synonyms.length; x++){
-//                     if (iLimit<5&&!keywordsRaw.includes(data[i][0].meanings[n].synonyms[x])){
-//                         keywordsRaw.push(data[i][0].meanings[n].synonyms[x]);
-//                     };
-//                 };
-//             };
-//         };
-//     }).then(()=>{
-//         console.log(keywordsRaw.length)
-//     })
+    // console.log(waitTest)
+    
+
+    // const waitTest = await Promise.allSettled(promisesFloat).then((response)=>{
+    //     let dataResult = [];
+    //     for (let i=0; i<response.length; i++){
+    //         if (response[i].value[0][0]==="error"){
+    //             response.splice(i, 1);
+    //         } else {
+    //             dataResult.push(response[i].value[0])
+    //             keywordSluice.push(keywordsFloat[i])
+    //         }
+    //     }
+    //     Promise.allSettled(dataResult).then((results)=>{
+            // for (let i=0; i<results.length; i++){
+            //     let iLimit = 0;
+            //     for (let n=0; n<results[i].value[0].meanings.length; n++){
+            //         let shortcut = results[i].value[0].meanings[n]
+            //         for (let x=0; x< shortcut.synonyms.length; x++){
+            //             if (iLimit<5){
+            //                 keywordSluice.push(shortcut.synonyms[x]);
+            //             };
+            //         };
+            //     };
+            // };
+    //     })
+    // })
 };
 
 function keywordSifter(){
     for (let i=0; i<keywordSluice.length; i++){
-        console.log(keywordsRaw.includes(keywordSluice[i]))
+        // console.log(keywordsRaw.includes(keywordSluice[i])+": "+keywordSluice[i])
         if (!keywordsRaw.includes(keywordSluice[i])){
             keywordsRaw.push(keywordSluice[i]);
         } else {
@@ -307,63 +291,6 @@ function keywordSifter(){
     keywordSluice=[];
     localStorage.setItem("keywordsMaster", JSON.stringify(keywordsRaw));
 };
-
-// function wordParser(str){
-//     let storedKeywords = JSON.parse(localStorage.getItem("keywordsMaster"));
-//     if (storedKeywords !== null){
-//         keywordsRaw = storedKeywords;
-//     };
-//     // let tempArray = str.split(/\s/gi);
-//     let tempArray = str.split(" ");
-//     for (let i=0; i<tempArray.length; i++){
-//         // let word = tempArray[i]
-//         // console.log(word)
-//         let punFn = (word)=>{
-//             let newWord = "";
-//             for (let n=0; n<word.length; n++){
-//                 if (word[n]!=="."&&word[n]!==","){
-//                     newWord+=word[n];
-//                 };
-//             };
-//             return newWord;
-//         };
-//         tempArray[i] = punFn(tempArray[i]);
-//         if (bugWords.includes(tempArray[i].toUpperCase())){
-//             keywordsRaw.push(tempArray[i].toUpperCase());
-//         } else{
-//             if (!keywordsRaw.includes(tempArray[i].toUpperCase())&&!stopwordsData.includes(tempArray[i].toLowerCase())&&!tempArray[i].includes("type-")&&!tempArray.includes("≊")){
-//                 fetch("https://api.dictionaryapi.dev/api/v2/entries/en/"+tempArray[i])
-//                 .then((response)=>{
-//                     if (response.status ===200){
-//                         return response.json()
-//                     };
-                    
-//                 })
-//                 .then((data)=>{
-//                     // console.log(data)
-//                     if (data!==undefined){
-//                         let iLimit = 0;
-//                         keywordsRaw.push(tempArray[i].toUpperCase());
-//                         for (let n=0; n<data[0].meanings.length; n++){
-//                             for (let x=0; x<data[0].meanings[n].synonyms.length; x++){
-//                                 let shortenedEx = data[0].meanings[n].synonyms[x];
-//                                 if (iLimit<5&&!keywordsRaw.includes(shortenedEx)){
-//                                     keywordsRaw.push(shortenedEx.toUpperCase());
-//                                     iLimit++;
-//                                 };
-//                             };
-//                         };
-//                     };
-//                 })
-//             };
-//         }
-        
-//     };
-//     // Promise.all(keywordsRaw).then(()=>{
-//     //     console.log(keywordsRaw);
-//     // });
-
-// };
 
 
 // Render Functions
@@ -531,23 +458,27 @@ function renderEmojis(){
         
         let gridList = document.getElementsByClassName("emojiGrid");
         let choiceSlots = document.getElementsByClassName("choiceSlot");
+        isLoading = true;
+        renderLoad();
         for (let i=0; i<gridList.length; i++){
             gridList[i].removeEventListener("click", addEmoji);
         };
         for (let i=0; i<choiceSlots.length; i++){
             choiceSlots[i].removeEventListener("click", removeEmoji);
         };
-        
+        const loadTest =  await new Promise(resolve => setTimeout(resolve, 5000));
+
         for (let i=0; i<chosenEmojis.length; i++){
             const wait1 = await wordParser(chosenEmojis[i].name);
             const wait2 = await wordParser(chosenEmojis[i].group);
         };
-        console.log(errorLogs)
-        console.log(keywordSluice)
+        // console.log(errorLogs)
+        // console.log(keywordSluice)
         keywordSifter();
-        console.log(keywordsRaw)
-        console.log(keywordsTrash)
-        stageUpFn();
+        // console.log(keywordsRaw)
+        // console.log(keywordsTrash)
+        isLoading = false;
+        // stageUpFn();
     };
 
     function renderEmojiGrid(){
@@ -773,6 +704,58 @@ function renderInput(){
     
 };
 
+function renderLoad(){
+    setTimeout(()=>{
+        if (isLoading){
+            baseCard.innerHTML="";
+            // let h3 = document.createElement("h3");
+            let waitDiv = document.createElement("div");
+            let svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+            // let svg = document.createElement("svg");
+            let path1 = document.createElement("path");
+            let path2 = document.createElement("path");
+            let span = document.createElement("span");
+
+            waitDiv.setAttribute("role", "status");
+
+            svg.setAttribute("aria-hidden", "true");
+            svg.setAttribute("class", "inline w-8 h-8 mr-2 text-gray-200 animate-spin dark:text-gray-600 fill-pink-600");
+            // svg.setAttributeNS("", "viewBox", "0 0 100 101");
+            svg.setAttribute("viewBox", "0 0 100 101");
+            svg.setAttribute("fill", "none");
+            svg.setAttribute("xmlns", "http://www.w3.org/2000/svg");
+
+            path1.setAttribute("d", "M100 50.5908C100 78.2051 77.6142 100.591 50 100.591C22.3858 100.591 0 78.2051 0 50.5908C0 22.9766 22.3858 0.59082 50 0.59082C77.6142 0.59082 100 22.9766 100 50.5908ZM9.08144 50.5908C9.08144 73.1895 27.4013 91.5094 50 91.5094C72.5987 91.5094 90.9186 73.1895 90.9186 50.5908C90.9186 27.9921 72.5987 9.67226 50 9.67226C27.4013 9.67226 9.08144 27.9921 9.08144 50.5908Z");
+            path1.setAttribute("fill", "currentColor");
+
+            path2.setAttribute("d", "M93.9676 39.0409C96.393 38.4038 97.8624 35.9116 97.0079 33.5539C95.2932 28.8227 92.871 24.3692 89.8167 20.348C85.8452 15.1192 80.8826 10.7238 75.2124 7.41289C69.5422 4.10194 63.2754 1.94025 56.7698 1.05124C51.7666 0.367541 46.6976 0.446843 41.7345 1.27873C39.2613 1.69328 37.813 4.19778 38.4501 6.62326C39.0873 9.04874 41.5694 10.4717 44.0505 10.1071C47.8511 9.54855 51.7191 9.52689 55.5402 10.0491C60.8642 10.7766 65.9928 12.5457 70.6331 15.2552C75.2735 17.9648 79.3347 21.5619 82.5849 25.841C84.9175 28.9121 86.7997 32.2913 88.1811 35.8758C89.083 38.2158 91.5421 39.6781 93.9676 39.0409Z");
+            path2.setAttribute("fill", "currentFill");
+
+            span.setAttribute("class", "sr-only");
+            span.textContent = "Loading..."
+
+
+            // <div role="status">
+            //     <svg aria-hidden="true" class="inline w-8 h-8 mr-2 text-gray-200 animate-spin dark:text-gray-600 fill-pink-600" viewBox="0 0 100 101" fill="none" xmlns="http://www.w3.org/2000/svg">
+            //         <path d="M100 50.5908C100 78.2051 77.6142 100.591 50 100.591C22.3858 100.591 0 78.2051 0 50.5908C0 22.9766 22.3858 0.59082 50 0.59082C77.6142 0.59082 100 22.9766 100 50.5908ZM9.08144 50.5908C9.08144 73.1895 27.4013 91.5094 50 91.5094C72.5987 91.5094 90.9186 73.1895 90.9186 50.5908C90.9186 27.9921 72.5987 9.67226 50 9.67226C27.4013 9.67226 9.08144 27.9921 9.08144 50.5908Z" fill="currentColor"/>
+            //         <path d="M93.9676 39.0409C96.393 38.4038 97.8624 35.9116 97.0079 33.5539C95.2932 28.8227 92.871 24.3692 89.8167 20.348C85.8452 15.1192 80.8826 10.7238 75.2124 7.41289C69.5422 4.10194 63.2754 1.94025 56.7698 1.05124C51.7666 0.367541 46.6976 0.446843 41.7345 1.27873C39.2613 1.69328 37.813 4.19778 38.4501 6.62326C39.0873 9.04874 41.5694 10.4717 44.0505 10.1071C47.8511 9.54855 51.7191 9.52689 55.5402 10.0491C60.8642 10.7766 65.9928 12.5457 70.6331 15.2552C75.2735 17.9648 79.3347 21.5619 82.5849 25.841C84.9175 28.9121 86.7997 32.2913 88.1811 35.8758C89.083 38.2158 91.5421 39.6781 93.9676 39.0409Z" fill="currentFill"/>
+            //     </svg>
+            //     <span class="sr-only">Loading...</span>
+            // </div>
+
+            svg.appendChild(path1);
+            svg.appendChild(path2);
+
+            waitDiv.appendChild(svg);
+            waitDiv.appendChild(span);
+
+            baseCard.appendChild(waitDiv);
+        }
+    }, 500);
+};
+
+
+
 // fetch("https://emojihub.yurace.pro/api/all")
 //     .then((response)=>{
 //         if (response.status===200){
@@ -988,7 +971,7 @@ let omdbUrl = "http://www.omdbapi.com/?apikey=1aa15ab1&type=movie&plot=full&s=$c
 //     .then((data)=>{console.log(data)})
 
 let testWords = ["apple", "orange", "sparrow", "fork"];
-let testPush =[]
+let testPush =[];
 
 function testFetch(word){
     fetch("https://api.dictionaryapi.dev/api/v2/entries/en/"+word)
