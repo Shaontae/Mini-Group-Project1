@@ -195,10 +195,10 @@ function resetButtonFn(){
 
 function buttonCheck(element, condition, fn){
     if (!condition){
-        element.setAttribute("class", "emoji-submit off");
+        element.setAttribute("class", "nextButton off");
         element.removeEventListener("click", fn);
     } else {
-        element.setAttribute("class", "emoji-submit on");
+        element.setAttribute("class", "nextButton on");
         element.addEventListener("click", fn, { once:true });
     };
 };
@@ -718,7 +718,7 @@ function renderInput(){
     userForm.setAttribute("class", "userForm");
     // question.setAttribute("class", "question");
     userInput.setAttribute("class", "userInput");
-    button.setAttribute("class", "emoji-submit");
+    button.setAttribute("class", "nextButton");
 
     userInput.setAttribute("maxLength", "500");
     button.setAttribute("style", "align-self: end")
