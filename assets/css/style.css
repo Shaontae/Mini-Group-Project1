@@ -99,6 +99,25 @@ main{
     color: inherit;
 }
 
+
+/* These are the new Color Changer Styles */
+.play-pause{
+    font-size: 2.5rem;
+}
+.play-pause:hover{
+    cursor: pointer;
+    color: yellow;
+}
+
+.play-pause:active{
+    color: inherit;
+}
+
+.nv{
+    visibility: hidden;
+}
+/* /Color Changer */
+
 .base-card{
 /* box-sizing: border-box;
 position: relative; */
@@ -325,4 +344,31 @@ h3{
 
 /* /Input Page Styles */
 
+
+/* Loading Screen */
+
+.loadDiv{
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    font-size: 5rem;
+    padding: 10rem 5rem;
+}
+.staticDiv{
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: start;
+    min-width: 327.2px;
+}
+/* .loadDiv p{
+    justify-self: center;
+    white-space: nowrap;
+} */
+/* .loadDiv span{
+    white-space: nowrap;
+} */
+
+/* /Loading Screen */
 
