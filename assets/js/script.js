@@ -12,10 +12,10 @@ class ColorVar {
         this.label = label;
         this.oCode = oCode;
         ColorVar.instances.push(this);
-        this.paused = false; // Add a 'paused' property to track the pause state
+        // this.paused = false; // Add a 'paused' property to track the pause state
     }
     changeFn() {
-        if (this.paused) return; // Check if the color change is paused
+        // if (this.paused) return; // Check if the color change is paused
         let rVal = () => {
             return Math.floor(Math.random() * 255);
         };
@@ -28,9 +28,9 @@ class ColorVar {
     cResetFn() {
         document.body.style.setProperty(this.label, this.oCode);
     }
-    togglePause() {
-        this.paused = !this.paused; // Toggle the 'paused' state
-    }
+    // togglePause() {
+    //     this.paused = !this.paused; // Toggle the 'paused' state
+    // }
 }
 
 const color1 = new ColorVar("--color1", "#b4e8b4");
@@ -122,6 +122,7 @@ let containerHeader = document.querySelector("#container-header");
 let headerTitle = document.querySelector("#container-h2");
 let baseCard = document.querySelector("#base-card");
 let resetButton = document.querySelector("#reset-button");
+let canvas = document.querySelector("#canvas");
 
 // // bodyEl.addEventListener("click", colorChange);
 // stopEl.addEventListener("click",()=>{
@@ -145,7 +146,7 @@ resetButton.addEventListener("click", resetButtonFn);
 
 
 // renderEmojis();
-
+renderSmiley();
 stageFunction();
 
 // Misc. FUnctions
@@ -343,6 +344,39 @@ function keywordSifter(){
 
 // Render Functions
 
+function renderSmiley(){
+    
+    for (let i=0; i<mapTotal.length; i++){
+        let ul = document.createElement("ul");
+        ul.setAttribute("class", "mapRow");
+        for (let n=0; n<mapTotal[i].length; n++){
+            // let coordinates = [i, n]
+            let currentObj = null;
+            let li = document.createElement("li");
+            
+            // li.dataset.coordinates = i+","+n;
+            for (let x=0; x<MapColor.instances.length; x++){
+                // console.log(MapColor.instances[x])
+                for (let y=0; y<MapColor.instances[x].array.length; y++){
+                    // console.log(i)
+                    // console.log(n)
+                    // console.log(MapColor.instances[x].array[y][0], MapColor.instances[x].array[y][1])
+                    if (MapColor.instances[x].array[y][0]===i&&MapColor.instances[x].array[y][1]===n){
+                        currentObj=MapColor.instances[x];
+                    };
+                };
+            };
+            if (currentObj!==null){
+                li.setAttribute("class", "mapTile "+currentObj.clss);
+            } else {
+                li.setAttribute("class", "mapTile");
+            };
+            ul.appendChild(li);
+        };
+        canvas.appendChild(ul);
+    };
+};
+
 function renderStart(){
     let emojiNum = 0;
 
@@ -405,7 +439,7 @@ function renderStart(){
         stageUpFn();
     };
 
-}
+};
 
 function emojiRandomizer(eNum){
     // let storedENum = JSON.parse(localStorage.getItem("eNumMaster"));
@@ -721,6 +755,7 @@ function renderInput(){
     button.setAttribute("class", "nextButton");
 
     userInput.setAttribute("maxLength", "500");
+    userInput.dataset.wordMax = "250";
     button.setAttribute("style", "align-self: end")
 
     headerTitle.textContent="Time to Type"
@@ -747,9 +782,15 @@ function renderInput(){
             if (key !== 8&&key !== 46){
                 console.log("coming soon.")
             };
+        };
+    };
+    
+    function questionPicker(question){
+        let output = null;
+        function randoQ(){
+
         }
     }
-    
 };
 
 function renderLoad(){

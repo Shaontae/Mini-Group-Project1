@@ -20,7 +20,23 @@ header{
     color: var(--color1);
     
 }
+/* New HTML Elements */
+.logo-box{
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 1.5rem;
+}
 
+
+.map-canvas{
+    display: flex;
+    flex-direction: column;
+    flex-wrap: nowrap;
+    justify-content: start;
+    align-items: start;
+}
+/* /New HTML Elements */
 
 h1{
 
@@ -363,13 +379,36 @@ h3{
     justify-content: start;
     min-width: 327.2px;
 }
-/* .loadDiv p{
-    justify-self: center;
-    white-space: nowrap;
-} */
-/* .loadDiv span{
-    white-space: nowrap;
-} */
-
 /* /Loading Screen */
 
+/* Smiley Map */
+.mapRow{
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+}
+
+.mapTile{
+    display: flex;
+    /* width: .125rem;
+    height: .125rem; */
+    /* padding: .0625rem; */
+    padding: .125rem;
+}
+
+.mapGreen{
+    background-color: var(--color1);
+}
+.mapBlue{
+ background-color: var(--color2);
+}
+.mapPink{
+    background-color: var(--color5);
+}
+.mapShadow{
+    filter: brightness(75%);
+}
+.mapWhite{
+    background-color: var(--color4);
+}
+/* /Smiley Map */
