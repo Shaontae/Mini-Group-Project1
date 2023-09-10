@@ -147,7 +147,7 @@ color: var(--color4);
 
 }
 
-h3{
+.h3{
     font-size: 1.5rem;
 }
 
@@ -190,6 +190,7 @@ h3{
     flex-direction: column;
     align-items: center;
     margin: 1rem 0;
+    gap: .5rem;
 }
 
 .randoInput{
@@ -334,10 +335,41 @@ h3{
     align-self: start;
 }
 
-.userInput{
+.questionDiv{
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: .5rem;
+    align-self: start;
+}
+
+.qWrapDiv{
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    flex-wrap: wrap;
+    max-width: 45rem;
+    padding-left: .5rem;
+}
+
+.customAria{
+    font-size: 2rem;
+
+}
+
+.customAria:hover{
+    cursor: pointer;
+    color: yellow;
+}
+
+.customAria:active{
+    color: inherit;
+}
+
+.userInputEl{
     display: flex;
     font-size: 1.5;
-    padding: .5rem;
+    padding: .5rem 1rem;
     min-height: 20rem;
     min-width: 50rem;
     margin-top: 1rem;
@@ -347,15 +379,23 @@ h3{
     border-radius: 2px;
 }
 
-.userInput:focus{
+.userInputEl:focus{
     outline: 2px ridge var(--color4);
 }
 
-.charMax{
+.wordMaxEl{
     display: flex;
     align-self: end;
     margin-bottom: 2rem;
 
+}
+
+.wcTrue{
+    color: #00FF00;
+}
+
+.wcFalse{
+    color: red;
 }
 
 
@@ -406,7 +446,7 @@ h3{
     background-color: var(--color5);
 }
 .mapShadow{
-    filter: brightness(75%);
+    filter: brightness(85%);
 }
 .mapWhite{
     background-color: var(--color4);
