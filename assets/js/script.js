@@ -240,9 +240,12 @@ function textSplit(str){
     // return floatArray;
     let floatArray = str.split(" ");
     floatArray = floatArray.map((word)=>{
-        word=word.replace(/'s/g, "");
+        word = word.replace(/'t/gi, "qxqxqx");
+        word=word.replace(/'s/gi, "");
         word=word.replace(/\d/g, "");
         word=word.replace(/\W/g," ");
+        word = word.replace(/qxqxqx/gi, "'t");
+
         return word.split(" ").filter((char)=>{
             if (char!==""){
             return true;
@@ -255,11 +258,6 @@ function textSplit(str){
 };
 
 async function wordParser(str){
-    // Test Variables
-    let runTime = 0;
-    let isRunning = true
-    timeTest()
-    // /Test Variables
 
 
     // console.log(str)
@@ -440,21 +438,7 @@ async function wordParser(str){
         // console.log(wordObj)
         // console.log(wordObj.syns5())
         return wordObj
-    }
-
-    // Time Test Results
-    function timeTest(){
-        let testTimer = setInterval(()=>{
-            runTime++;
-            if (!isRunning){
-                clearInterval(testTimer);
-            };
-        }, 10);
     };
-    runTime = runTime/100;
-    isRunning = false;
-    console.log(str)
-    console.log(runTime)
 };
 
 function keywordSifter(){
@@ -488,12 +472,13 @@ async function moviesCompiler(){
     // /Test Variables
 
     let wordSoup = [];
-    let spentWords = [];
+    // let spentWords = [];
     let movieDump = [];
     // let movieSluice=[];
     let movieProms=[];
-    let moviePromsAdv=[];
-    let moviePop=25;
+    // let moviePromsAdv=[];
+    let titleWords = [];
+    let moviePop=50;
 
 
     for (let i=0; i<keywordsRaw.length; i++){
@@ -509,24 +494,10 @@ async function moviesCompiler(){
         // console.log(wordSoup)
     };
     wordSoup=[...new Set(wordSoup)];
-    console.log("Word Soup:")
-    console.log(wordSoup)
-    breaker=0
-    while (movieMatches.length<moviePop){
-        if (breaker>=1){
-            break;
-        }
-        if (wordSoup.length===0){
-            break;
-        } else {
-            const moviesAdd = await moviePusher();
-        };
-        breaker++;
-    };
-
-    async function moviePusher(){
-        let moviesPending =[];
-        let titleWords = [];
+    
+    if (wordSoup.length<moviePop){
+        titleWords=wordSoup;
+    }else{
         while (titleWords.length<moviePop){
             let randoTitle = wordPicker();
             while (titleWords.includes(randoTitle)){
@@ -534,6 +505,36 @@ async function moviesCompiler(){
             };
             titleWords.push(randoTitle);
         };
+    };
+    console.log("Word Soup:")
+    console.log(wordSoup)
+    breaker=0
+    while (movieMatches.length<titleWords.length){
+        // if (breaker>=1){
+        //     break;
+        // }
+        // if (wordSoup.length===0){
+        //     break;
+        // } else {
+        //     const moviesAdd = await moviePusher();
+        //     dumpProcessor();
+
+        // };
+        // breaker++;
+        if (breaker>=1){
+            break;
+        }
+        const moviesAdd = await moviePusher();
+        // THIS IS WHERE THE PROBLEM IS
+        // THE MOVIEMATCH ADD IS IN THE DUMPPROCESSOR
+        breaker++
+    };
+    dumpProcessor();
+    console.log(movieMatches)
+
+    async function moviePusher(){
+        let moviesPending =[];
+        
         console.log("Title Words:")
         console.log(titleWords);
         const initPulls = await starterPulls(titleWords);
@@ -591,12 +592,37 @@ async function moviesCompiler(){
         console.log(movieDump)
     };
 
-    async function dumpProcessor(){
+    function dumpProcessor(){
         movieDump.forEach((pullGroup)=>{
             pullGroup.package.value.results.forEach((movie)=>{
-                
-            })
-        })
+                let movieObj = {
+                    title: movie.title,
+                    data: movie,
+                    id: movie.id,
+                    score: 0,
+                }
+                movieObj["titleSplit"]=splitAssign(movie.title);
+                movieObj["oTitleSplit"]=splitAssign(movie.original_title);
+                movieObj["plotSplit"]=splitAssign(movie.overview);
+                unifiedSplit=movieObj.titleSplit.concat(movieObj.oTitleSplit, movieObj.plotSplit);
+                movie["wordSoup"]=[...new Set(unifiedSplit)]
+
+                // console.log(movieObj);
+
+                movieMatches.push(movieObj);
+
+                function splitAssign(str){
+                    let strSplit = textSplit(str);
+                    return [...new Set(strSplit)].filter((word)=>{
+                        if (stopwordsData.includes(word.toLowerCase())){
+                            return false;
+                        } else{
+                            return true;
+                        };
+                    });
+                }
+            });
+        });
     }
     
     async function starterPulls(array){
