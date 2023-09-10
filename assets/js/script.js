@@ -73,45 +73,64 @@ function playPauseFn(event){
         
 }
 
-
-const colorSwitch = document.getElementById('colorSwitch');
-const pauseButton = document.getElementById('pauseButton'); // Add a pause button
-const pauseLabel = document.getElementById('pauseLabel');
-
-// colorSwitch.addEventListener('change', () => {
-//     if (colorSwitch.checked) {
-//         // Show the pause button and label using Tailwind CSS classes
-//         pauseLabel.classList.remove('hidden');
-//         pauseButton.classList.remove('hidden');
-//         document.body.addEventListener('click', () => {
-//             ColorVar.instances.forEach(colorVar => colorVar.changeFn());
-//         });
-//     } else {
-//         ColorVar.instances.forEach(colorVar => colorVar.cResetFn());
-//         document.body.removeEventListener('click', () => {
-//             ColorVar.instances.forEach(colorVar => colorVar.changeFn());
-//         });
-//         // Hide the pause button and label using Tailwind CSS classes
-//         pauseLabel.classList.add('hidden');
-//         pauseButton.classList.add('hidden');
-//     }
-// });
-
-// pauseButton.addEventListener('click', () => {
-//     // Toggle the pause state for all ColorVar instances
-//     ColorVar.instances.forEach(colorVar => colorVar.togglePause());
-// });
-
+// Local Storage Variables
+let stage = 0;
 let chosenEmojis = [];
 let eligibleEmojis = [];
 let keywordsRaw = [];
+let currentQuestion = null;
+let userInputRaw = "";
+let movieMatches = [];
+// /Local Storage Variables
+
 let keywordSluice = [];
-let keywordsTrash = [];
+
 let errorLogs = [];
-let bugWords = ["CHRISTMAS", "SANTA", "ASIAN", "CHINESE", "JAPANESE", "SNOWBOARDER"];
+let keywordsTrash = [];
+
+
+let bugWordsRaw = [
+    ["Christmas", ["winter", "holiday", "gifts", "nativity", "snow", "Santa", "Claus"]],
+    ["Santa", ["Christmas", "Claus", "sleigh", "gifts", "jolly", "beard", "reindeer"]],
+    ["Claus", ["Christmas", "Claus", "sleigh", "gifts", "jolly", "beard", "reindeer"]],
+    ["Asian", ["Asia", "asiatic", "China", "Japan", "Korea", "Vietnam"]],
+    ["Chinese", ["Asia", "Asian", "China"]],
+    ["Japanese", ["Asia", "Asian", "Japan", "Anime"]],
+    ["snowboarder", ["snow", "snowboard", "mountain", "cold", "ice", "ski", "winter", "athlete", "sport", "sports"]],
+    ["American", ["USA", "America"]],
+    ["lifter", ["lift", "workout", "exercise", "athlete", "weights", "strong", "buff", "muscular"]],
+    ["Vulcan", ["space", "alien", "aliens", "nerd", "nerds", "logic", "logical", "dork", "dorks", "smart", "intelligent", "intelligence", "extraterrestrial"]],
+    ["Oden", ["Norse", "Vikings", "Thor", "pagan", "deity", "gods", "medieval", "brabarian", "barbarians"]],
+    ["dishware", ["silverware", "fork", "forks", "spoon", "spoons", "knife", "knives", "plate", "plates", "dishes", "dish", "food", "dining", "dinner", "tablecloth"]]
+];
+let bugObjects = bugWordsRaw.map((word)=>{
+    let bwObj ={
+        primary: word[0],
+        syns: word[1],
+        syns5: function(){
+            // console.log(this.syns)
+            if (this.syns.length<6){
+                return this.syns;
+            } else {
+                let synsDump =[];
+                while(synsDump.length<5){
+                    let randSyn = Math.floor(Math.random()*this.syns.length);
+                    if (!synsDump.includes(this.syns[randSyn])){
+                        synsDump.push(this.syns[randSyn]);
+                    };
+                };
+                return synsDump;
+            };
+        }
+    };
+    return bwObj;
+});
+let bugWords = bugWordsRaw.map((word)=>{
+    return word[0].toUpperCase();
+});
 // let emojiNum = 0;
-let stage = 0;
-let stageArray = [renderStart, renderEmojis, renderInput];
+
+let stageArray = [renderStart, renderEmojis, renderInput, renderPicker];
 
 let isLoading = false;
 
@@ -124,23 +143,6 @@ let baseCard = document.querySelector("#base-card");
 let resetButton = document.querySelector("#reset-button");
 let canvas = document.querySelector("#canvas");
 
-// // bodyEl.addEventListener("click", colorChange);
-// stopEl.addEventListener("click",()=>{
-    // for (let i=0; i<ColorVar.instances.length; i++){
-    //     ColorVar.instances[i].cResetFn();
-    //     bodyEl.removeEventListener("click", colorChange);
-    // };
-// })
-// pauseEl.addEventListener("click",()=>{
-//     for (let i=0; i<ColorVar.instances.length; i++){
-//         bodyEl.removeEventListener("click", colorChange);
-//     };
-// });
-// playEl.addEventListener("click",()=>{
-    // for (let i=0; i<ColorVar.instances.length; i++){
-    //     bodyEl.addEventListener("click", colorChange);
-    // };
-// });
 
 resetButton.addEventListener("click", resetButtonFn);
 
@@ -180,6 +182,9 @@ function resetButtonFn(){
     chosenEmojis = [];
     eligibleEmojis = [];
     keywordsRaw = [];
+    currentQuestion=null;
+    userInputRaw = "";
+    movieMatches =[];
     
     
     localStorage.setItem("stageMaster", JSON.stringify(stage));
@@ -187,6 +192,9 @@ function resetButtonFn(){
     localStorage.setItem("emojisMaster", JSON.stringify(chosenEmojis));
     localStorage.setItem("eligibleMaster", JSON.stringify(eligibleEmojis));
     localStorage.setItem("keywordsMaster", JSON.stringify(keywordsRaw));
+    localStorage.setItem("questionMaster", JSON.stringify(currentQuestion));
+    localStorage.setItem("inputMaster", JSON.stringify(userInputRaw));
+    localStorage.setItem("moviestMaster", JSON.stringify(movieMatches));
 
 
     // call startupFunction
@@ -212,11 +220,44 @@ function stageUpFn(){
     stageFunction();
 };
 
+function textSplit(str){
+    let floatArray = str.split(/\s/g);
+    let symbols =["`","~", "!", "@", "#", "$", "%", "^", "&", "*", "(", ")", "-", "_", "=", "+", "[", "]", "{", "}", "|", ",", "<", ">", ".", "/", "?", ";", ":", '"', "'"];
+    // console.log(floatCount)
+    floatArray = floatArray.filter((word)=>{
+        if (word !== ""&&!symbols.includes(word)){
+            return true;
+        } else {
+            return false;
+        }
+    })
+    // console.log(floatCount)
+    return floatArray;
+};
+
 async function wordParser(str){
+    // console.log(str)
     let keywordsFloat = [];
     let storedKeywords = JSON.parse(localStorage.getItem("keywordsMaster"));
     if (storedKeywords !== null){
         keywordsRaw = storedKeywords;
+        storedKeywords.forEach((keyword)=>{
+            keyword["syns5"]=function(){
+                // console.log(this.syns)
+                if (this.syns.length<6){
+                    return this.syns;
+                } else {
+                    let synsDump =[];
+                    while(synsDump.length<5){
+                        let randSyn = Math.floor(Math.random()*this.syns.length);
+                        if (!synsDump.includes(this.syns[randSyn])){
+                            synsDump.push(this.syns[randSyn]);
+                        };
+                    };
+                    return synsDump;
+                };
+            }
+        })
     };
 
     let primaryArray = keywordsRaw.map((kwObj)=>{
@@ -233,21 +274,25 @@ async function wordParser(str){
         return newWord;
     };
     let splitArray = str.split(" ");
+    // splitArray.push("Christmas")
+    // console.log(splitArray)
     
     for (let i=0; i<splitArray.length; i++){
         splitArray[i] = puncFn(splitArray[i]);
         if (bugWords.includes(splitArray[i].toUpperCase())){
-            let keywordObj = createKWObj(splitArray[i]);
+            // let keywordObj = createKWObj(splitArray[i]);
             // keywordSluice.push(splitArray[i].toUpperCase());
-            keywordSluice.push(keywordObj);
+            // keywordSluice.push(keywordObj);
+            keywordSluice.push(bugObjects[bugWords.indexOf(splitArray[i].toUpperCase())]);
         } else {
-            if (!primaryArray.includes(splitArray[i].toUpperCase())&&!stopwordsData.includes(splitArray[i].toLowerCase())&&!splitArray[i].includes("type-")&&!splitArray.includes("≊")){
+            if (!primaryArray.includes(splitArray[i].toUpperCase())&&!stopwordsData.includes(splitArray[i].toLowerCase())&&!splitArray[i].includes("type-")&&!splitArray[i].includes("≊")){
                 keywordsFloat.push(splitArray[i]);
             } else {
                 keywordsTrash.push(splitArray[i]);
             }
         };
     };
+    
     let promisesFloat = keywordsFloat.map(r => fetch("https://api.dictionaryapi.dev/api/v2/entries/en/"+r)
         .then((result)=>{
             if (result.status===200){
@@ -262,8 +307,10 @@ async function wordParser(str){
                 return "error";
             };
         }))
+    // console.log(keywordsFloat)
 
     const waitTest = await Promise.allSettled(promisesFloat).then((response)=>{
+        
         let results = response.filter((el)=>{
             if (el.value==="error"){
                 return false;
@@ -271,37 +318,53 @@ async function wordParser(str){
                 return true;
             };
         });
+        
         let kwObjsFloat = results.map((obj)=>{
             let newObj = createKWObj(obj.value[0].word);
             return newObj;
         });
-
+        
         for (let i=0; i<results.length; i++){
-            let synTest =0;
+            // let synTest =0;
             let synsFloat = [];
+            
             let currentObj= objMatch(results[i].value[0].word);
+            
             for (let x=0; x<results[i].value.length; x++){
+                
                 for (let n=0; n<results[i].value[x].meanings.length; n++){
-                    synTest++;
-                    // console.log(results[i].value[0].word+": "+synTest+", "+results[i].value[x].meanings[n].synonyms)
+                    // synTest++;
                     synsFloat=synsFloat.concat(results[i].value[x].meanings[n].synonyms);
                 };
-                if (synsFloat.length<5){
-                    currentObj.syns=synsFloat;
-                } else {
-                    let synsDump =[];
-                    while(synsDump.length<5){
-                        let randSyn = Math.floor(Math.random()*synsFloat.length);
-                        if (!synsDump.includes(synsFloat[randSyn])){
-                            synsDump.push(synsFloat[randSyn]);
-                        };
-                    };
-                    currentObj.syns=synsDump;
-                };
+                    
+                // console.log(currentObj)
+                // console.log(synsFloat)
+                synsFloat=[...new Set(synsFloat)]
+                // console.log(synsFloat)
+                currentObj.syns=synsFloat;
+                // console.log(currentObj.syns)
+                // if (synsFloat.length<6){
+                //     console.log("less")
+                //     currentObj.syns=synsFloat;
+                // } else {
+                //     console.log("more")
+                //     let synsDump =[];
+                //     while(synsDump.length<5){
+                //         let randSyn = Math.floor(Math.random()*synsFloat.length);
+                //         if (!synsDump.includes(synsFloat[randSyn])){
+                //             synsDump.push(synsFloat[randSyn]);
+                //         };
+                //     };
+                //     currentObj.syns=synsDump;
+                // };
+                
             };
+            // console.log(currentObj)
+            // console.log(currentObj.syns5())
             keywordSluice.push(currentObj);
+            
         };
-
+        
         function objMatch(word){
             for (let i=0; i<kwObjsFloat.length; i++){
                 if (kwObjsFloat[i].primary===word){
@@ -310,12 +373,31 @@ async function wordParser(str){
             };
         };
     })
+    // console.log("bub")
 
     function createKWObj(word){
         let wordObj={
             primary: word,
-            syns: []
-        }
+            syns: [],
+            syns5: function(){
+                // console.log(this.syns)
+                if (this.syns.length<6){
+                    return this.syns;
+                } else {
+                    let synsDump =[];
+                    while(synsDump.length<5){
+                        let randSyn = Math.floor(Math.random()*this.syns.length);
+                        if (!synsDump.includes(this.syns[randSyn])){
+                            synsDump.push(this.syns[randSyn]);
+                        };
+                    };
+                    return synsDump;
+                };
+            }
+        };
+        // console.log(word)
+        // console.log(wordObj)
+        // console.log(wordObj.syns5())
         return wordObj
     }
 };
@@ -337,9 +419,173 @@ function keywordSifter(){
             keywordsTrash.push(keywordSluice[i]);
         };
     };
-    keywordSluice=[];
+    keywordSluice = [];
     localStorage.setItem("keywordsMaster", JSON.stringify(keywordsRaw));
 };
+
+async function moviesCompiler(){
+    console.log(keywordsRaw)
+    // Test Variables
+    let pullCount = 0;
+    let runTime = 0;
+    let isRunning = true
+    timeTest()
+    // /Test Variables
+
+    let wordSoup = [];
+    let spentWords = [];
+    let movieDump = [];
+    let movieSluice=[];
+    let movieProms=[];
+    let moviePromsAdv=[];
+    let moviePop=25;
+
+
+    for (let i=0; i<keywordsRaw.length; i++){
+        
+        let randoSyns = keywordsRaw[i].syns5();
+        // console.log(randoSyns)
+        wordSoup.push(keywordsRaw[i].primary);
+        wordSoup = wordSoup.concat(randoSyns);
+        // console.log(wordSoup)
+        // for (let n=0; n<randoSyns.length; n++){
+        //     wordSoup.push(randoSyns[n]);
+        // };
+        // console.log(wordSoup)
+    };
+    wordSoup=[...new Set(wordSoup)];
+    console.log("Word Soup:")
+    console.log(wordSoup)
+    breaker=0
+    while (movieMatches.length<moviePop){
+        if (breaker>=10){
+            break;
+        }
+        if (wordSoup.length===0){
+            break;
+        } else {
+            const moviesAdd = await moviePusher();
+        };
+        breaker++;
+    };
+
+    async function moviePusher(){
+        let moviesPending =[];
+        let titleWords = [];
+        while (titleWords.length<moviePop){
+            let randoTitle = wordPicker();
+            while (titleWords.includes(randoTitle)){
+                randoTitle = wordPicker();
+            };
+            titleWords.push(randoTitle);
+        };
+        console.log("Title Words:")
+        console.log(titleWords);
+        const initPulls = await starterPulls(titleWords);
+        console.log("Initial Promises")
+        console.log(movieProms)
+        const waitProms = await Promise.allSettled(movieProms).then((data)=>{
+            // let idFloat = [];
+            // if (moviesFloat>0){
+            //     idFloat=moviesFloat.map((movie))
+            // }
+            data.forEach((pull)=>{
+                let titleWord = titleWords[data.indexOf(pull)]
+                if (pull.total_pages>1){
+                    let rando = Math.floor(Math.random()*data.total_pages);
+                    let valueProm = moviePull(titleWord, rando);
+                    // Let's see if I can set an object's property to a promise,
+                    // Then push that object into an array
+                    // Then create a mapped array of only that object's value that is a promise
+                    // then promise all that map array
+                    pullObj = {
+                        package: valueProm,
+                        pullTitle: titleWord,
+                    }
+                    moviesPending.push(pullObj);
+                } else {
+                    pullObj = {
+                        package: pull,
+                        pullTitle: titleWord,
+                    }
+                    movieDump.push(pullObj);
+                }
+            })
+            
+        });
+        console.log("Did any title searches return only one page?")
+        console.log(movieDump)
+        console.log("Movies Pending (movie objects with promise values):")
+        console.log(moviesPending)
+        if (moviesPending.length>0){
+            let pendingProms = moviesPending.map((obj)=>{
+                return obj.package;
+            });
+            console.log("Movie Promises (promises extracted from objects)");
+            console.log(pendingProms)
+            const waitPromsAdv = await Promise.allSettled(pendingProms).then((response)=>{
+                for (let i=0; i<response.length; i++){
+                    moviesPending[i].package = response[i];
+                    movieDump.push(moviesPending[i]);
+                };
+            });
+        };
+        console.log(movieDump)
+    };
+
+    async function dumpProcessor(){
+        
+    }
+    
+    async function starterPulls(array){
+        array.forEach((titleWordVar)=>{
+            movieProms.push(moviePull(titleWordVar, 1));
+            // console.log("Let's see if I can read this:")
+            // console.log(moviePull(titleWordVar, 1))
+        })
+    };
+
+    async function moviePull (word, page){
+        // console.log("Pull Check:")
+        // console.log(word)
+        // console.log(page)
+        let movieUrl = "https://api.themoviedb.org/3/search/movie?api_key=654175309f8dda54d6e0ea0c7706fa04&include_adult=false&include_video=false&language=en-US&page=1&sort_by=popularity.desc&query="+word+"&page="+page;
+        // console.log(movieUrl)
+        // array.push(fetch(movieUrl).then((response)=>{
+        return fetch(movieUrl).then((response)=>{
+            // console.log(response)
+            pullCount++;
+            if (response.status===200){
+                return response.json();
+            } else {
+                errorLogs.push(response.status, word, "movie");
+            };
+        })
+        // .then((data)=>{
+        //     console.log("Title: "+word)
+        //     console.log(data)
+        // })
+        // )
+    };
+
+    function wordPicker(){
+        return wordSoup[Math.floor(Math.random()*wordSoup.length)];
+    };
+
+    function timeTest(){
+        let testTimer = setInterval(()=>{
+            runTime++;
+            if (!isRunning){
+                clearInterval(testTimer);
+            };
+        }, 10);
+    };
+
+    runTime = runTime/100;
+    isRunning = false;
+    console.log(runTime)
+    console.log(pullCount)
+}
 
 
 // Render Functions
@@ -395,6 +641,7 @@ function renderStart(){
         };
     };
 
+    randoTitle.setAttribute("class", "h3");
     randoInput.setAttribute("class", "randoInput");
     randoInput.setAttribute("placeholder", "25-1089");
     randoInput.setAttribute("value", "");
@@ -503,6 +750,7 @@ function renderEmojis(){
     let emojisContainer = document.createElement("div");
     let fullUl = document.createElement("ul");
 
+    emojiTitle.setAttribute("class", "h3");
     
     eChoiceCard.setAttribute("class", "eChoiceCard")
     choiceList.setAttribute("class", "emoji-choice-list");
@@ -552,12 +800,16 @@ function renderEmojis(){
 
         for (let i=0; i<chosenEmojis.length; i++){
             const wait1 = await wordParser(chosenEmojis[i].name);
-            const wait2 = await wordParser(chosenEmojis[i].group);
+            if (chosenEmojis[i].group!=="activities"){
+                const wait2 = await wordParser(chosenEmojis[i].group);
+            }
+            
         };
+        // console.log("bub")
         // console.log(errorLogs)
         // console.log(keywordSluice)
         keywordSifter();
-        // console.log(keywordsRaw)
+        console.log(keywordsRaw)
         // console.log(keywordsTrash)
         isLoading = false;
         stageUpFn();
@@ -736,62 +988,195 @@ function renderEmojis(){
 };
 
 function renderInput(){
+    let wordMin = 10;
+    let wordMax =250;
+    
+
+    let storedQuestion = JSON.parse(localStorage.getItem("questionMaster"));
+    let storedInput = JSON.parse(localStorage.getItem("inputMaster"));
+    if (storedQuestion!==null){
+        currentQuestion = storedQuestion;
+    };
+    if (storedInput!==null){
+        userInputRaw = storedInput;
+    };
     // let charN = 0;
     let inputBox = document.createElement("div");
     let userForm = document.createElement("form");
     // let question = document.createElement("label");
-    let question = document.createElement("h3");
-    let userInput = document.createElement("textarea");
-    let charMax = document.createElement("p");
+    let questionDiv = document.createElement("div");
+    let qWrapDiv = document.createElement("div");
+    let questionEl = document.createElement("h3");
+    let refresh = document.createElement("i");
+    let userInputEl = document.createElement("textarea");
+    let wordMaxEl = document.createElement("p");
     let button = document.createElement("div");
-    
+
+    let wordCount = ()=>{
+        // console.log(userInputEl.value)
+        if (userInputEl.value!==undefined&&userInputEl.value!==""){
+            let countFloat = textSplit(userInputEl.value);
+            return countFloat.length
+            // let floatCount = userInputEl.value.split(/\s/g);
+            // let symbols =["`","~", "!", "@", "#", "$", "%", "^", "&", "*", "(", ")", "-", "_", "=", "+", "[", "]", "{", "}", "|", ",", "<", ">", ".", "/", "?", ";", ":", '"', "'"];
+            // // console.log(floatCount)
+            // floatCount = floatCount.filter((word)=>{
+            //     if (word !== ""&&!symbols.includes(word)){
+            //         return true;
+            //     } else {
+            //         return false;
+            //     }
+            // })
+            // // console.log(floatCount)
+            // return floatCount.length;
+        } else {
+            return 0;
+        };
+    };
     
 
+    let inputCondition = ()=>{
+        if (wordCount()>=wordMin&&wordCount()<=wordMax){
+            return true;
+        } else {
+            return false;
+        }
+    };
+    
+    questionDiv.setAttribute("class", "questionDiv");
+    refresh.setAttribute("class", "material-icons customAria");
+    qWrapDiv.setAttribute("class", "qWrapDiv");
+    questionEl.setAttribute("class", "h3");
     inputBox.setAttribute("class", "inputBox");
-    charMax.setAttribute("class", "charMax");
+    // wordMaxEl.setAttribute("class", "wordMaxEl");
     userForm.setAttribute("class", "userForm");
     // question.setAttribute("class", "question");
-    userInput.setAttribute("class", "userInput");
+    userInputEl.setAttribute("class", "userInputEl");
     button.setAttribute("class", "nextButton");
 
-    userInput.setAttribute("maxLength", "500");
-    userInput.dataset.wordMax = "250";
-    button.setAttribute("style", "align-self: end")
+    // userInputEl.setAttribute("maxLength", "500");
+    userInputEl.setAttribute("placeholder", "Ten word minimum...");
+    if (userInputRaw.length>0){
+        userInputEl.value = userInputRaw;
+    };
+    // userInputEl.dataset.wordMax = "250";
+    button.setAttribute("style", "align-self: end");
 
-    headerTitle.textContent="Time to Type"
-    question.textContent = "What kind of movies are you into?"
-    charMax.textContent = userInput.value.trim().length+"/"+userInput.maxLength+" Characters"
+    headerTitle.textContent="Time to Type";
+
+    
+    if (currentQuestion===null){
+        currentQuestion=questionPicker(currentQuestion);
+    } else {
+        questionEl.textContent = currentQuestion.question;
+    }
+    refresh.textContent="refresh"
+
+
+    // question.textContent = "What kind of movies are you into?"
+    // console.log(wordCount()+"/"+wordMax+" Words")
+    // wordMaxEl.textContent = wordCount()+"/"+wordMax+" Words"
+    inputFnMini()
     button.textContent = "NEXT"
 
-    userForm.appendChild(question);
-    userForm.appendChild(userInput);
-    userForm.appendChild(charMax);
+    qWrapDiv.appendChild(questionEl);
+    questionDiv.appendChild(qWrapDiv);
+    questionDiv.appendChild(refresh);
+    userForm.appendChild(questionDiv);
+    userForm.appendChild(userInputEl);
+    userForm.appendChild(wordMaxEl);
     userForm.appendChild(button);
     inputBox.appendChild(userForm);
     baseCard.appendChild(inputBox);
 
-    userInput.addEventListener("keydown", charCounter);
+    userInputEl.addEventListener("keydown", inputFn);
+    refresh.addEventListener("click", questionPicker);
 
-    function charCounter(event){
-        if (~~~userInput.maxLength<=userInput.value.trim().length){
-            charMax.textContent= userInput.value.trim().length+"/"+userInput.maxLength+" Characters";
-            
+    
+
+    function inputFnMini(){
+        if (inputCondition()){
+            wordMaxEl.setAttribute("class", "wordMaxEl wcTrue");
         } else {
-            let key = event.keyCode || event.charCode;
-        
-            if (key !== 8&&key !== 46){
-                console.log("coming soon.")
-            };
+            wordMaxEl.setAttribute("class", "wordMaxEl wcFalse");
         };
+        buttonCheck(button, inputCondition(), inputButtonFn);
+        wordMaxEl.textContent = wordCount()+"/"+wordMax+" Words";
+    };
+
+    function inputFn(event){
+        let key = event.keyCode || event.charCode;
+        // console.log(wordCount())
+        if (inputCondition()){
+            wordMaxEl.setAttribute("class", "wordMaxEl wcTrue");
+            if (wordCount()===wordMax){
+                if (key !== 8&&key !== 46){
+                    event.preventDefault();
+                };
+            };
+            // call buttonChecker/add event listener/buttonfunction
+        } else {
+            
+            if (wordCount()>=wordMax){
+                if (key !== 8&&key !== 46){
+                    event.preventDefault();
+                };
+            };
+            
+            wordMaxEl.setAttribute("class", "wordMaxEl wcFalse");
+        };
+
+        wordMaxEl.textContent = wordCount()+"/"+wordMax+" Words";
+        // localStorage.setItem("inputMaster", userInputRaw);
+        localStorage.setItem("inputMaster", JSON.stringify(userInputEl.value));
+        buttonCheck(button, inputCondition(), inputButtonFn);
     };
     
     function questionPicker(question){
-        let output = null;
-        function randoQ(){
+        let output = randoQ();
+        if (question!==null){
+            while (output.index===question.index){
+                output = randoQ();
+            };
+        };
+        localStorage.setItem("questionMaster", JSON.stringify(output));
+        questionEl.textContent = output.question;
+        userInputEl.value="";
+        inputFnMini()
+        localStorage.setItem("inputMaster", JSON.stringify(userInputEl.value));
+        return output;
 
+        function randoQ(){
+            return questionsMain[Math.floor(Math.random()*questionsMain.length)];
+        };
+    };
+
+    async function inputButtonFn(){
+        console.log("bub")
+        let wordSplit = textSplit(userInputEl.value);
+        isLoading = true;
+        renderLoad();
+        for (let i=0; i<wordSplit.length; i++){
+            const wait2 = await wordParser(wordSplit[i]);
         }
-    }
+        
+
+        console.log(errorLogs)
+        console.log(keywordSluice)
+        keywordSifter();
+        console.log(keywordsRaw)
+        console.log(keywordsTrash)
+
+        // Movie Find Function
+        // const movieWait = await moviesCompiler();
+        isLoading = false;
+        stageUpFn();
+    };
 };
+
+function renderPicker(){
+
+}
 
 function renderLoad(){
     setTimeout(()=>{
@@ -1117,12 +1502,30 @@ testFn();
 // movieFetch("##Your Movie");
 
 
+// fetch("https://api.dictionaryapi.dev/api/v2/entries/en/savouring").then((response)=>{
+//     console.log("hubba")
+//     if (response.status===200){
+//         return response.json();
+//     } else {
+//         console.log("Vegetables: the forbidden fruit.")
+//     }
+// }).then((data)=>{
+//     console.log(data)
+// });
 
 
 
 
 
 
+fetch("https://api.themoviedb.org/3/search/movie?api_key=654175309f8dda54d6e0ea0c7706fa04&include_adult=false&include_video=false&language=en-US&page=1&sort_by=popularity.desc&query=alligator")
+.then((response)=>{
+    if (response.status===200){
+        return response.json();
+    }
+}).then((data)=>{
+    console.log(data);
+})
 
 
 
