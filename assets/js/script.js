@@ -95,13 +95,18 @@ let bugWordsRaw = [
     ["Claus", ["Christmas", "Claus", "sleigh", "gifts", "jolly", "beard", "reindeer"]],
     ["Asian", ["Asia", "asiatic", "China", "Japan", "Korea", "Vietnam"]],
     ["Chinese", ["Asia", "Asian", "China"]],
+    ["China", ["Asia", "Asian", "Chinese"]],
     ["Japanese", ["Asia", "Asian", "Japan", "Anime"]],
+    ["Japan", ["Asia", "Asian", "Japanese", "Anime"]],
     ["snowboarder", ["snow", "snowboard", "mountain", "cold", "ice", "ski", "winter", "athlete", "sport", "sports"]],
     ["American", ["USA", "America"]],
     ["lifter", ["lift", "workout", "exercise", "athlete", "weights", "strong", "buff", "muscular"]],
     ["Vulcan", ["space", "alien", "aliens", "nerd", "nerds", "logic", "logical", "dork", "dorks", "smart", "intelligent", "intelligence", "extraterrestrial"]],
     ["Oden", ["Norse", "Vikings", "Thor", "pagan", "deity", "gods", "medieval", "brabarian", "barbarians"]],
-    ["dishware", ["silverware", "fork", "forks", "spoon", "spoons", "knife", "knives", "plate", "plates", "dishes", "dish", "food", "dining", "dinner", "tablecloth"]]
+    ["dishware", ["silverware", "fork", "forks", "spoon", "spoons", "knife", "knives", "plate", "plates", "dishes", "dish", "food", "dining", "dinner", "tablecloth"]],
+    ["Israel", ["Israeli", "Middle East", "Holy", "Judaism", "Islam", "Christianity", "Jerusalem"]],
+    ["Israeli", ["Israel", "Middle East", "Holy", "Jerusalem"]],
+    ["Chocolate"]
 ];
 let bugObjects = bugWordsRaw.map((word)=>{
     let bwObj ={
@@ -221,21 +226,42 @@ function stageUpFn(){
 };
 
 function textSplit(str){
-    let floatArray = str.split(/\s/g);
-    let symbols =["`","~", "!", "@", "#", "$", "%", "^", "&", "*", "(", ")", "-", "_", "=", "+", "[", "]", "{", "}", "|", ",", "<", ">", ".", "/", "?", ";", ":", '"', "'"];
-    // console.log(floatCount)
-    floatArray = floatArray.filter((word)=>{
-        if (word !== ""&&!symbols.includes(word)){
+    // let floatArray = str.split(/\s/g);
+    // let symbols =["`","~", "!", "@", "#", "$", "%", "^", "&", "*", "(", ")", "-", "_", "=", "+", "[", "]", "{", "}", "|", ",", "<", ">", ".", "/", "?", ";", ":", '"', "'"];
+    // // console.log(floatCount)
+    // floatArray = floatArray.filter((word)=>{
+    //     if (word !== ""&&!symbols.includes(word)){
+    //         return true;
+    //     } else {
+    //         return false;
+    //     }
+    // })
+    // // console.log(floatCount)
+    // return floatArray;
+    let floatArray = str.split(" ");
+    floatArray = floatArray.map((word)=>{
+        word=word.replace(/'s/g, "");
+        word=word.replace(/\d/g, "");
+        word=word.replace(/\W/g," ");
+        return word.split(" ").filter((char)=>{
+            if (char!==""){
             return true;
-        } else {
-            return false;
-        }
-    })
-    // console.log(floatCount)
-    return floatArray;
+            } else{
+                return false;
+            }
+        })
+    }).flat();
+    return floatArray
 };
 
 async function wordParser(str){
+    // Test Variables
+    let runTime = 0;
+    let isRunning = true
+    timeTest()
+    // /Test Variables
+
+
     // console.log(str)
     let keywordsFloat = [];
     let storedKeywords = JSON.parse(localStorage.getItem("keywordsMaster"));
@@ -264,28 +290,43 @@ async function wordParser(str){
         return kwObj.primary;
     })
 
-    let puncFn = (word)=>{
-        let newWord = "";
-        for (let n=0; n<word.length; n++){
-            if (word[n]!=="."&&word[n]!==","){
-                newWord+=word[n];
-            };
-        };
-        return newWord;
-    };
-    let splitArray = str.split(" ");
+    // let puncFn = (word)=>{
+    //     let newWord = "";
+    //     for (let n=0; n<word.length; n++){
+    //         if (word[n]!=="."&&word[n]!==","&&word[n]!=="'"){
+    //             newWord+=word[n];
+    //         };
+    //     };
+    //     return newWord;
+    // };
+    // let splitArray = str.split(" ");
+
     // splitArray.push("Christmas")
     // console.log(splitArray)
+    // splitArray = splitArray.map((word)=>{
+    //     word=word.replace(/'s/g, "");
+    //     word=word.replace(/\d/g, "");
+    //     word=word.replace(/\W/g," ");
+    //     return word.split(" ").filter((char)=>{
+    //         if (char!==""){
+    //         return true;
+    //         } else{
+    //             return false;
+    //         }
+    //     })
+    // }).flat();
+
+    let splitArray = textSplit(str);
     
     for (let i=0; i<splitArray.length; i++){
-        splitArray[i] = puncFn(splitArray[i]);
+        // splitArray[i] = puncFn(splitArray[i]);
         if (bugWords.includes(splitArray[i].toUpperCase())){
             // let keywordObj = createKWObj(splitArray[i]);
             // keywordSluice.push(splitArray[i].toUpperCase());
             // keywordSluice.push(keywordObj);
             keywordSluice.push(bugObjects[bugWords.indexOf(splitArray[i].toUpperCase())]);
         } else {
-            if (!primaryArray.includes(splitArray[i].toUpperCase())&&!stopwordsData.includes(splitArray[i].toLowerCase())&&!splitArray[i].includes("type-")&&!splitArray[i].includes("≊")){
+            if (!primaryArray.includes(splitArray[i].toUpperCase())&&!stopwordsData.includes(splitArray[i].toLowerCase())&&!splitArray[i].includes("≊")){
                 keywordsFloat.push(splitArray[i]);
             } else {
                 keywordsTrash.push(splitArray[i]);
@@ -400,6 +441,20 @@ async function wordParser(str){
         // console.log(wordObj.syns5())
         return wordObj
     }
+
+    // Time Test Results
+    function timeTest(){
+        let testTimer = setInterval(()=>{
+            runTime++;
+            if (!isRunning){
+                clearInterval(testTimer);
+            };
+        }, 10);
+    };
+    runTime = runTime/100;
+    isRunning = false;
+    console.log(str)
+    console.log(runTime)
 };
 
 function keywordSifter(){
@@ -435,7 +490,7 @@ async function moviesCompiler(){
     let wordSoup = [];
     let spentWords = [];
     let movieDump = [];
-    let movieSluice=[];
+    // let movieSluice=[];
     let movieProms=[];
     let moviePromsAdv=[];
     let moviePop=25;
@@ -458,7 +513,7 @@ async function moviesCompiler(){
     console.log(wordSoup)
     breaker=0
     while (movieMatches.length<moviePop){
-        if (breaker>=10){
+        if (breaker>=1){
             break;
         }
         if (wordSoup.length===0){
@@ -489,10 +544,13 @@ async function moviesCompiler(){
             // if (moviesFloat>0){
             //     idFloat=moviesFloat.map((movie))
             // }
+            let mTest = 0;
+            let aTest =0;
             data.forEach((pull)=>{
+                
                 let titleWord = titleWords[data.indexOf(pull)]
-                if (pull.total_pages>1){
-                    let rando = Math.floor(Math.random()*data.total_pages);
+                if (pull.value.total_pages>1){
+                    let rando = Math.ceil(Math.random()*pull.value.total_pages);
                     let valueProm = moviePull(titleWord, rando);
                     // Let's see if I can set an object's property to a promise,
                     // Then push that object into an array
@@ -508,21 +566,21 @@ async function moviesCompiler(){
                         package: pull,
                         pullTitle: titleWord,
                     }
-                    movieDump.push(pullObj);
+                    if (pull.value.total_result>0){
+                        movieDump.push(pullObj);
+                    }
                 }
             })
             
         });
-        console.log("Did any title searches return only one page?")
-        console.log(movieDump)
-        console.log("Movies Pending (movie objects with promise values):")
-        console.log(moviesPending)
+        // console.log("Movies Pending (movie objects with promise values):")
+        // console.log(moviesPending)
         if (moviesPending.length>0){
             let pendingProms = moviesPending.map((obj)=>{
                 return obj.package;
             });
-            console.log("Movie Promises (promises extracted from objects)");
-            console.log(pendingProms)
+            // console.log("Movie Promises (promises extracted from objects)");
+            // console.log(pendingProms)
             const waitPromsAdv = await Promise.allSettled(pendingProms).then((response)=>{
                 for (let i=0; i<response.length; i++){
                     moviesPending[i].package = response[i];
@@ -534,7 +592,11 @@ async function moviesCompiler(){
     };
 
     async function dumpProcessor(){
-        
+        movieDump.forEach((pullGroup)=>{
+            pullGroup.package.value.results.forEach((movie)=>{
+                
+            })
+        })
     }
     
     async function starterPulls(array){
@@ -572,6 +634,9 @@ async function moviesCompiler(){
         return wordSoup[Math.floor(Math.random()*wordSoup.length)];
     };
 
+    
+
+    // Time Test Results
     function timeTest(){
         let testTimer = setInterval(()=>{
             runTime++;
@@ -580,7 +645,6 @@ async function moviesCompiler(){
             };
         }, 10);
     };
-
     runTime = runTime/100;
     isRunning = false;
     console.log(runTime)
@@ -1168,7 +1232,7 @@ function renderInput(){
         console.log(keywordsTrash)
 
         // Movie Find Function
-        // const movieWait = await moviesCompiler();
+        const movieWait = await moviesCompiler();
         isLoading = false;
         stageUpFn();
     };
@@ -1525,6 +1589,29 @@ fetch("https://api.themoviedb.org/3/search/movie?api_key=654175309f8dda54d6e0ea0
     }
 }).then((data)=>{
     console.log(data);
+    // console.log(data.results[0].overview)
+    // fetch("https://api.themoviedb.org/3/movie/"+data.results[0].id+"/external_ids?api_key=654175309f8dda54d6e0ea0c7706fa04")
+    // .then((response)=>{
+    //     if (response.status===200){
+    //         return response.json()
+    //     } else{
+    //         return "error"
+    //     }
+
+    // }).then((data)=>{
+    //     // console.log(data)
+    //     fetch("http://www.omdbapi.com/?apikey=1aa15ab1&type=movie&plot=full&i="+data.imdb_id).then((response)=>{
+    //         if (response.status===200){
+    //             return response.json()
+    //         } else{
+    //             return "error"
+    //         }
+    
+    //     }).then((data)=>{
+    //         console.log(data)
+    //         console.log(data.Plot)
+    //     })
+    // })
 })
 
 

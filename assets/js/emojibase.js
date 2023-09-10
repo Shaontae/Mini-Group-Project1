@@ -4469,7 +4469,7 @@ var emojiData = [
         "unicode": ["U+1F459"]
     },
     {
-        "name": "womans clothes ≊ womanâ€™s clothes",
+        "name": "woman's clothes ≊ womanâ€™s clothes",
         "category": "smileys and people",
         "group": "clothing",
         "htmlCode": ["&#128090;"],
@@ -4511,7 +4511,7 @@ var emojiData = [
         "unicode": ["U+1F392"]
     },
     {
-        "name": "mans shoe ≊ manâ€™s shoe",
+        "name": "man's shoe ≊ manâ€™s shoe",
         "category": "smileys and people",
         "group": "clothing",
         "htmlCode": ["&#128094;"],
@@ -4532,14 +4532,14 @@ var emojiData = [
         "unicode": ["U+1F460"]
     },
     {
-        "name": "womans sandal ≊ womanâ€™s sandal",
+        "name": "woman's sandal ≊ womanâ€™s sandal",
         "category": "smileys and people",
         "group": "clothing",
         "htmlCode": ["&#128097;"],
         "unicode": ["U+1F461"]
     },
     {
-        "name": "womans boots ≊ womanâ€™s boot",
+        "name": "woman's boots ≊ womanâ€™s boot",
         "category": "smileys and people",
         "group": "clothing",
         "htmlCode": ["&#128098;"],
@@ -4553,7 +4553,7 @@ var emojiData = [
         "unicode": ["U+1F451"]
     },
     {
-        "name": "womans hat ≊ womanâ€™s hat",
+        "name": "woman's hat ≊ womanâ€™s hat",
         "category": "smileys and people",
         "group": "clothing",
         "htmlCode": ["&#128082;"],
@@ -6562,7 +6562,7 @@ var emojiData = [
         "unicode": ["U+1F3CB", "U+1F3FF"]
     },
     {
-        "name": "bicyclist ≊ person biking",
+        "name": "cyclist ≊ person biking ≊ bike ≊ bicycle",
         "category": "activities",
         "group": "activities",
         "htmlCode": ["&#128692;"],
