@@ -21,7 +21,10 @@
 </head>
 <body id="body" class="flex flex-col min-h-screen">
     <header class=" flex justify-between items-center p-4 p-6">
-        <h1 class="text-5xl">Follow Your Mood</h1>
+        <div class="logo-box">
+            <h1 class="text-5xl">Follow Your Mood</h1>
+            <div id="canvas" class="map-canvas"></div>
+        </div>
         <div id="reset-button" class="reset-button">RESET</divn>
     </header>
     <main class="flex justify-center items-start grow p-8 p-16">
@@ -73,11 +76,13 @@
     <!-- Source: https://github.com/cheatsnake/emojihub -->
     <script src="./assets/js/emojibase.js"></script>
 
-    <!-- Source: https://github.com/lizkavalski/random-question-backend -->
+    <!-- Source: https://www.scienceofpeople.com/getting-to-know-you-questions/ -->
     <script src="./assets/js/questions.js"></script>
 
     <!-- Source: https://github.com/stopwords-iso/stopwords-en -->
     <script src="./assets/js/stopwords-en.js"></script>
+
+    <script src="./assets/js/smileymap.js"></script>
 
     <script src="./assets/js/script.js"></script>
 </body>
