@@ -81,6 +81,7 @@ let keywordsRaw = [];
 let currentQuestion = null;
 let userInputRaw = "";
 let movieMatches = [];
+let movieKeywords =[];
 // /Local Storage Variables
 
 let keywordSluice = [];
@@ -190,6 +191,7 @@ function resetButtonFn(){
     currentQuestion=null;
     userInputRaw = "";
     movieMatches =[];
+    movieKeywords =[];
     
     
     localStorage.setItem("stageMaster", JSON.stringify(stage));
@@ -200,6 +202,7 @@ function resetButtonFn(){
     localStorage.setItem("questionMaster", JSON.stringify(currentQuestion));
     localStorage.setItem("inputMaster", JSON.stringify(userInputRaw));
     localStorage.setItem("moviestMaster", JSON.stringify(movieMatches));
+    localStorage.setItem("mkwMaster", JSON.stringify(movieKeywords));
 
 
     // call startupFunction
@@ -506,40 +509,21 @@ async function moviesCompiler(){
             titleWords.push(randoTitle);
         };
     };
-    console.log("Word Soup:")
-    console.log(wordSoup)
-    breaker=0
-    while (movieMatches.length<titleWords.length){
-        // if (breaker>=1){
-        //     break;
-        // }
-        // if (wordSoup.length===0){
-        //     break;
-        // } else {
-        //     const moviesAdd = await moviePusher();
-        //     dumpProcessor();
-
-        // };
-        // breaker++;
-        if (breaker>=1){
-            break;
-        }
-        const moviesAdd = await moviePusher();
-        // THIS IS WHERE THE PROBLEM IS
-        // THE MOVIEMATCH ADD IS IN THE DUMPPROCESSOR
-        breaker++
-    };
+    // console.log("Word Soup:")
+    // console.log(wordSoup)
+    const moviesAdd = await moviePusher();
     dumpProcessor();
+    localStorage.setItem("moviesMaster", JSON.stringify(movieMatches));
     console.log(movieMatches)
 
     async function moviePusher(){
         let moviesPending =[];
         
-        console.log("Title Words:")
-        console.log(titleWords);
+        // console.log("Title Words:")
+        // console.log(titleWords);
         const initPulls = await starterPulls(titleWords);
-        console.log("Initial Promises")
-        console.log(movieProms)
+        // console.log("Initial Promises")
+        // console.log(movieProms)
         const waitProms = await Promise.allSettled(movieProms).then((data)=>{
             // let idFloat = [];
             // if (moviesFloat>0){
@@ -589,7 +573,7 @@ async function moviesCompiler(){
                 };
             });
         };
-        console.log(movieDump)
+        // console.log(movieDump)
     };
 
     function dumpProcessor(){
@@ -605,7 +589,7 @@ async function moviesCompiler(){
                 movieObj["oTitleSplit"]=splitAssign(movie.original_title);
                 movieObj["plotSplit"]=splitAssign(movie.overview);
                 unifiedSplit=movieObj.titleSplit.concat(movieObj.oTitleSplit, movieObj.plotSplit);
-                movie["wordSoup"]=[...new Set(unifiedSplit)]
+                movieObj["wordSoup"]=[...new Set(unifiedSplit)]
 
                 // console.log(movieObj);
 
@@ -676,6 +660,66 @@ async function moviesCompiler(){
     console.log(runTime)
     console.log(pullCount)
 }
+
+function mkwTabulator(){
+    let mkwSluice=[];
+    let tabMin = 8;
+    let mkwMax = 25;
+    movieMatches.forEach((movie)=>{
+        // let movieArrays = [movie.titleSplit, movie.oTitleSplit, movie.plotSplit];
+        // movieArrays.forEach((array)=>{mkwDump(array)});
+        // mkwSluice= mkwSluice.concat(movie.wordSoup);
+        mkwSluice= mkwSluice.concat(movie.plotSplit);
+    });
+
+    let movieKeywordsFloat=[...new Set(mkwSluice)].map((mkw)=>{
+        let mkwObj={
+            word: mkw,
+            tab: 0,
+        };
+        movieMatches.forEach((movie)=>{
+            // if (movie.wordSoup.includes(mkw)){
+            if (movie.plotSplit.includes(mkw)){
+                mkwObj.tab++;
+            };
+        });
+
+        return mkwObj;
+    }).filter((mkwObject)=>{
+        if (mkwObject.tab>=tabMin){
+            return true;
+        } else{
+            return false;
+        }
+    }).sort(compareTabs);
+
+    if (movieKeywordsFloat.length>mkwMax){
+        while (movieKeywords.length<mkwMax){
+            let mkwRando = ()=>{
+               return movieKeywordsFloat[Math.floor(Math.random()*movieKeywordsFloat.length)]
+            };
+            let mkwRandoOP = mkwRando();
+            // console.log(mkwRandoOP)
+            while (movieKeywords.includes(mkwRandoOP)){
+                mkwRandoOP = mkwRando();
+            }
+            movieKeywords.push(mkwRandoOP);
+        };
+    } else{
+        movieKeywords=movieKeywordsFloat
+    }
+   
+    localStorage.setItem("mkwMaster", JSON.stringify(movieKeywords));
+
+    function compareTabs(a,b){
+        return a.tab-b.tab;
+    }
+    // function mkwDump(array){
+    //     array.forEach((word)=>{
+    //         mkwSluice.push(word);
+    //     });
+    // };
+};
 
 
 // Render Functions
@@ -798,7 +842,6 @@ function emojiRandomizer(eNum){
     };
     localStorage.setItem("eligibleMaster", JSON.stringify(eligibleEmojis));
 };
-
 
 function renderEmojis(){
     let storedEligible = JSON.parse(localStorage.getItem("eligibleMaster"));
@@ -1242,7 +1285,6 @@ function renderInput(){
     };
 
     async function inputButtonFn(){
-        console.log("bub")
         let wordSplit = textSplit(userInputEl.value);
         isLoading = true;
         renderLoad();
@@ -1259,6 +1301,9 @@ function renderInput(){
 
         // Movie Find Function
         const movieWait = await moviesCompiler();
+        mkwTabulator();
+        console.log("MKW: ")
+        console.log(movieKeywords);
         isLoading = false;
         stageUpFn();
     };
