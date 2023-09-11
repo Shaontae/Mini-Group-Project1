@@ -83,6 +83,9 @@ main{
    /* max-width: 80%; */
    /* min-height: 100%; */
    /* height: 80vh; */
+   box-shadow: 0 0 10px 6px var(--shadow);
+   border-radius: 20px;
+   background: rgb(42, 42, 42);
 }
 
 .container-header{
@@ -90,8 +93,8 @@ main{
     background-color: var(--color5);
     /* color: var(--color4); */
     color: var(--color2);
-    
-
+    border-top-right-radius: 20px;
+    border-top-left-radius: 20px;
 }
 
 .container-h2{
@@ -143,6 +146,8 @@ position: relative; */
 /* background-color: chartreuse; */
 background: rgb(42, 42, 42);
 color: var(--color4);
+border-bottom-left-radius: inherit;
+border-bottom-right-radius: 20px;
 /* background-color: var(--color4); */
 
 }
@@ -181,6 +186,9 @@ color: var(--color4);
 
 .nextButton.off{
     background-color: rgb(94, 93, 93);
+}
+.nextButton.off:hover{
+    cursor: inherit;
 }
 
 
@@ -452,3 +460,56 @@ color: var(--color4);
     background-color: var(--color4);
 }
 /* /Smiley Map */
+
+/* MKW Picker */
+.mkwTitleCard{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+.listBox{
+    display: flex;
+    max-height: 50vh;
+    min-width: 40vw;
+    overflow-y: scroll;
+    background-color: var(--color3);
+    padding: 1rem 1.5rem;
+    flex-grow: 1;
+}
+.mkwUl{
+    display: flex;
+    flex-direction: column;
+    gap: .25rem;
+    /* flex-grow: 1; */
+}
+
+.mkwLi{
+    display: flex;
+    align-items: center;
+    font-size: 1.75rem;
+    background-color: black;
+    padding: .25rem 1.5rem;
+    border-radius: 30px;
+    /* flex-grow: 0; */
+    box-shadow: 0 0 7px var(--shadow);
+    padding-right: 8rem;
+    padding-bottom: .5rem;
+}
+
+.mkwLi:hover{
+    cursor: pointer;
+    background-color: var(--color4);
+    color: black;
+}
+
+.selected{
+    background-color: var(--color1);
+    color: var(--color2);
+}
+.selected:hover{
+    background-color: var(--color2);
+    color: var(--color1);
+}
+/* /MKW Picker */

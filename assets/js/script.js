@@ -82,6 +82,7 @@ let currentQuestion = null;
 let userInputRaw = "";
 let movieMatches = [];
 let movieKeywords =[];
+let mkwSelections = [];
 // /Local Storage Variables
 
 let keywordSluice = [];
@@ -192,6 +193,7 @@ function resetButtonFn(){
     userInputRaw = "";
     movieMatches =[];
     movieKeywords =[];
+    mkwSelections = [];
     
     
     localStorage.setItem("stageMaster", JSON.stringify(stage));
@@ -203,6 +205,7 @@ function resetButtonFn(){
     localStorage.setItem("inputMaster", JSON.stringify(userInputRaw));
     localStorage.setItem("moviestMaster", JSON.stringify(movieMatches));
     localStorage.setItem("mkwMaster", JSON.stringify(movieKeywords));
+    localStorage.setItem("selectionsMaster", JSON.stringify(mkwSelections));
 
 
     // call startupFunction
@@ -585,6 +588,7 @@ async function moviesCompiler(){
                     id: movie.id,
                     score: 0,
                 }
+                
                 movieObj["titleSplit"]=splitAssign(movie.title);
                 movieObj["oTitleSplit"]=splitAssign(movie.original_title);
                 movieObj["plotSplit"]=splitAssign(movie.overview);
@@ -597,7 +601,9 @@ async function moviesCompiler(){
 
                 function splitAssign(str){
                     let strSplit = textSplit(str);
-                    return [...new Set(strSplit)].filter((word)=>{
+                    return [...new Set(strSplit)].map((word)=>{
+                        return word.toLowerCase();
+                    }).filter((word)=>{
                         if (stopwordsData.includes(word.toLowerCase())){
                             return false;
                         } else{
@@ -663,8 +669,8 @@ async function moviesCompiler(){
 
 function mkwTabulator(){
     let mkwSluice=[];
-    let tabMin = 8;
-    let mkwMax = 25;
+    let tabMin = 6;
+    let mkwMax = 100;
     movieMatches.forEach((movie)=>{
         // let movieArrays = [movie.titleSplit, movie.oTitleSplit, movie.plotSplit];
         // movieArrays.forEach((array)=>{mkwDump(array)});
@@ -1310,8 +1316,107 @@ function renderInput(){
 };
 
 function renderPicker(){
+    let storedMkwSelections=JSON.parse(localStorage.getItem("selectionsMaster"));
+    if (storedMkwSelections!==null){
+        console.log(storedMkwSelections)
+        mkwSelections=storedMkwSelections;
+    };
+    let storedMKW = JSON.parse(localStorage.getItem("mkwMaster"));
+    if (storedMKW!==null){
+        movieKeywords=storedMKW;
+    };
+    for (let i=0; i<movieKeywords.length; i++){
+        movieKeywords[i]["index"]=i;
+    }
+    let selectionsMin = 5;
+    let mkwCondition = ()=>{
+        if (mkwSelections.length<selectionsMin){
+            return false;
+        } else {
+            return true;
+        };
+    };
 
-}
+    let titleCard = document.createElement("div");
+    let h3 = document.createElement("h3");
+    let button = document.createElement("button");
+    let listBox = document.createElement("div");
+    let ul = document.createElement("ul");
+
+    titleCard.setAttribute("class", "mkwTitleCard");
+    h3.setAttribute("class", "h3");
+    listBox.setAttribute("class", "listBox");
+    ul.setAttribute("class", "mkwUl");
+
+    h3.textContent = "Choose at least "+selectionsMin+" keywords that resonate you."
+    headerTitle.textContent = "Choose Your Words"
+
+    button.textContent = "NEXT"
+
+    buttonCheck(button, mkwCondition(), mkwButtonFn);
+
+    renderList();
+
+    titleCard.appendChild(h3);
+    titleCard.appendChild(button);
+
+    listBox.appendChild(ul);
+
+    baseCard.appendChild(titleCard);
+    baseCard.appendChild(listBox);
+
+    function mkwButtonFn (){
+
+    }
+
+    function renderList(){
+        for (let i=0; i<movieKeywords.length; i++){
+            let li = document.createElement("li");
+
+            let onlyWords=mkwSelections.map((item)=>{
+                return item.word;
+            })
+
+            if (onlyWords.includes(movieKeywords[i].word)){
+                li.setAttribute("class", "mkwLi selected");
+            } else {
+                li.setAttribute("class", "mkwLi");
+            }
+            
+            li.dataset.index=i;
+            li.textContent = movieKeywords[i].word;
+
+            ul.appendChild(li);
+            // Add Eventlisteners
+            li.addEventListener("click", mkwSelect);
+        };
+    };
+    function mkwSelect(event){
+        element=event.target;
+        let currentMKW = null;
+        movieKeywords.forEach((mkw)=>{
+            if (~~element.dataset.index===mkw.index){
+                currentMKW = mkw;
+            }
+        });
+        let selectionWords=mkwSelections.map((selection)=>{
+            return selection.word;
+        });
+        if (!selectionWords.includes(currentMKW.word)){
+            element.setAttribute("class", "mkwLi selected");
+            mkwSelections.push(currentMKW);
+        } else {
+            element.setAttribute("class", "mkwLi");
+            for (let i=0; i<mkwSelections.length; i++){
+                if (mkwSelections[i].word===currentMKW.word){
+                    mkwSelections.splice(i, 1);
+                };
+            };
+        };
+        localStorage.setItem("selectionsMaster", JSON.stringify(mkwSelections));
+        buttonCheck(button, mkwCondition(), mkwButtonFn);
+    };
+};
 
 function renderLoad(){
     setTimeout(()=>{
