@@ -1642,48 +1642,48 @@ async function renderMovieCard(){
 
 
 
-    winnerProm = [];
-    console.log(winner)
-    console.log(winner.id)
-    const addOmdbData= await fetch("https://api.themoviedb.org/3/movie/"+winner.id+"/external_ids?api_key=654175309f8dda54d6e0ea0c7706fa04")
-    .then((response)=>{
-        if (response.status===200){
-            return response.json()
-        } else{
-            return "error"
-        }
+    // winnerProm = [];
+    // console.log(winner)
+    // console.log(winner.id)
+    // const addOmdbData= await fetch("https://api.themoviedb.org/3/movie/"+winner.id+"/external_ids?api_key=654175309f8dda54d6e0ea0c7706fa04")
+    // .then((response)=>{
+    //     if (response.status===200){
+    //         return response.json()
+    //     } else{
+    //         return "error"
+    //     }
 
-    }).then((data)=>{
-        console.log(data)
-        if (data.imdb_id!==null){
-            winnerProm.push(
-                fetch("http://www.omdbapi.com/?apikey=1aa15ab1&type=movie&plot=full&i="+data.imdb_id)
-                .then((response)=>{
-                    if (response.status===200){
-                        return response.json()
-                    } else{
-                        return "error"
-                    };
-                }))
-        } else{
-            winner["omdbData"]="N/A";
-            winner["fullPlot"]="N/A";
-            winner["year"]=winner.altYear;
-            winner["director"]="N/A";
-            winner["cast"]="N/A";
-        }
+    // }).then((data)=>{
+    //     console.log(data)
+    //     if (data.imdb_id!==null){
+    //         winnerProm.push(
+    //             fetch("http://www.omdbapi.com/?apikey=1aa15ab1&type=movie&plot=full&i="+data.imdb_id)
+    //             .then((response)=>{
+    //                 if (response.status===200){
+    //                     return response.json()
+    //                 } else{
+    //                     return "error"
+    //                 };
+    //             }))
+    //     } else{
+    //         winner["omdbData"]="N/A";
+    //         winner["fullPlot"]="N/A";
+    //         winner["year"]=winner.altYear;
+    //         winner["director"]="N/A";
+    //         winner["cast"]="N/A";
+    //     }
         
         
-    });
-    const waitForWinner = await Promise.allSettled(winnerProm).then((data)=>{
-        console.log(data)
-        winner["omdbData"]=data[0].value;
-        winner["fullPlot"]=data[0].value.Plot;
-        winner["year"]=data[0].value.Year;
-        winner["director"]=data[0].value.Director;
-        winner["cast"]=data[0].value.Actors;
-    })
-    console.log(winner)
+    // });
+    // const waitForWinner = await Promise.allSettled(winnerProm).then((data)=>{
+    //     console.log(data)
+    //     winner["omdbData"]=data[0].value;
+    //     winner["fullPlot"]=data[0].value.Plot;
+    //     winner["year"]=data[0].value.Year;
+    //     winner["director"]=data[0].value.Director;
+    //     winner["cast"]=data[0].value.Actors;
+    // })
+    // console.log(winner)
     // let plot = (movie)=>{
     //     console.log(movie)
     //     // if (movie.fullPlot===undefined){
@@ -1747,24 +1747,24 @@ async function renderMovieCard(){
     
     
 
-    directorLabel.textContent="Directed by:";
-    directorText.textContent = winner.director;
-    castLabel.textContent="Cast:";
-    castText.textContent=winner.cast;
+    // directorLabel.textContent="Directed by:";
+    // directorText.textContent = winner.director;
+    // castLabel.textContent="Cast:";
+    // castText.textContent=winner.cast;
 
-    if (winner.fullPlot!==undefined&&winner.fullPlot!=="N/A"){
-        plotText.textContent=winner.fullPlot;
-    } else {
-        plotText.textContent=winner.altPlot;
-    }
-    
+    // if (winner.fullPlot!==undefined&&winner.fullPlot!=="N/A"){
+    //     plotText.textContent=winner.fullPlot;
+    // } else {
+    //     plotText.textContent=winner.altPlot;
+    // }
+    plotText.textContent=winner.altPlot;
     // if (movie.year!==undefined){
     //     movieTitle.textContent = winner.title+" ("+winner.year+")";
     // } else{
     //     movieTitle.textContent = winner.title+" ("+winner.altYear+")";
     // };
 
-    movieTitle.textContent = winner.title+" ("+winner.year+")";
+    movieTitle.textContent = winner.title+" ("+winner.altYear+")";
     
 
 
@@ -1777,8 +1777,8 @@ async function renderMovieCard(){
     titleDiv.appendChild(movieTitle);
 
     detailsCard.appendChild(titleDiv);
-    detailsCard.appendChild(directorDiv);
-    detailsCard.appendChild(castDiv);
+    // detailsCard.appendChild(directorDiv);
+    // detailsCard.appendChild(castDiv);
 
     plotDiv.appendChild(plotText);
 
