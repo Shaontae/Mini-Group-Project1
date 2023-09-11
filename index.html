@@ -19,13 +19,13 @@
     <link rel="icon" type="image/x-icon" href="./assets/images/fym-favicon5.png">
     <title>Follow Your Mood</title>
 </head>
-<body id="body" class="flex flex-col min-h-screen">
-    <header class=" flex justify-between items-center p-4 p-6">
+<body id="body" class="flex flex-col min-h-screen sm:center">
+    <header class=" flex justify-between items-center p-4 p-6 text-center">
         <div class="logo-box">
-            <h1 class="text-5xl">Follow Your Mood</h1>
-            <div id="canvas" class="map-canvas"></div>
+            <h1 class="text-5xl sm:static md:flex">Follow Your Mood</h1>
+            <div id="canvas" class="map-canvas flex flex-col flex-nowrap justify-start items-start"></div>
         </div>
-        <div id="reset-button" class="reset-button">RESET</divn>
+        <div id="reset-button" class="reset-button sm:spacing-40 md:w-40">RESET</divn>
     </header>
     <main class="flex justify-center items-start grow p-8 p-16">
         <div id="container" class="container flex flex-col border-2 border-solid border-black">
