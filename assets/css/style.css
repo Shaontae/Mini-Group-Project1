@@ -556,7 +556,7 @@ border-bottom-right-radius: 20px;
     flex-wrap: wrap;
     padding: .5rem;
     padding-top: 1rem;
-    max-height: 50vh;
+    max-height: 80vh;
     overflow-y: scroll;
 }
 
