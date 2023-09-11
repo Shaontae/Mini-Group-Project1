@@ -513,3 +513,64 @@ border-bottom-right-radius: 20px;
     color: var(--color1);
 }
 /* /MKW Picker */
+
+
+
+/* Winner Page */
+.fullCard{
+    display: flex;
+    flex-direction: row;
+    gap: 1.5rem;
+    padding: 1rem;
+}
+.sideCard{
+    display: flex;
+    flex-direction: column;
+    padding: 1rem;
+    background-color: var(--color3);
+    font-size: 1.5rem;
+    box-shadow: 0 0 8px 5px var(--shadow);
+}
+
+.h4{
+    font-size: 2.5rem;
+    color: var(--color2);
+}
+
+.h5{
+    font-size: 1.75rem;
+    color: var(--color2);
+}
+
+.textSection{
+    display: flex;
+    flex-direction: row;
+    gap: .5rem;
+    align-items: center;
+    border-bottom: 1px solid var(--color2);
+    padding: .5rem 0;
+}
+
+.plotDiv{
+    display: flex;
+    flex-wrap: wrap;
+    padding: .5rem;
+    padding-top: 1rem;
+    max-height: 50vh;
+    overflow-y: scroll;
+}
+
+.poster{
+    box-shadow: 0 0 8px 5px var(--shadow);
+}
+
+.noPoster{
+    display:flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    font-size: 3rem;
+    box-shadow: 0 0 8px 5px var(--shadow);
+}
+
+/* /Winner Page */
