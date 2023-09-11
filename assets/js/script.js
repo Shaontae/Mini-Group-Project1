@@ -83,6 +83,7 @@ let userInputRaw = "";
 let movieMatches = [];
 let movieKeywords =[];
 let mkwSelections = [];
+let winner = null;
 // /Local Storage Variables
 
 let keywordSluice = [];
@@ -137,7 +138,7 @@ let bugWords = bugWordsRaw.map((word)=>{
 });
 // let emojiNum = 0;
 
-let stageArray = [renderStart, renderEmojis, renderInput, renderPicker];
+let stageArray = [renderStart, renderEmojis, renderInput, renderPicker, renderMovieCard];
 
 let isLoading = false;
 
@@ -158,7 +159,7 @@ resetButton.addEventListener("click", resetButtonFn);
 renderSmiley();
 stageFunction();
 
-// Misc. FUnctions
+// Misc. Functions
 function colorChange(){
     for (let i=0; i<ColorVar.instances.length; i++){
         ColorVar.instances[i].changeFn();
@@ -184,6 +185,8 @@ function resetButtonFn(){
 
     baseCard.innerHTML = '';
 
+    isLoading = false;
+
     stage = 0;
     // emojiNum = 0;
     chosenEmojis = [];
@@ -194,6 +197,7 @@ function resetButtonFn(){
     movieMatches =[];
     movieKeywords =[];
     mkwSelections = [];
+    winner = null;
     
     
     localStorage.setItem("stageMaster", JSON.stringify(stage));
@@ -203,9 +207,10 @@ function resetButtonFn(){
     localStorage.setItem("keywordsMaster", JSON.stringify(keywordsRaw));
     localStorage.setItem("questionMaster", JSON.stringify(currentQuestion));
     localStorage.setItem("inputMaster", JSON.stringify(userInputRaw));
-    localStorage.setItem("moviestMaster", JSON.stringify(movieMatches));
+    localStorage.setItem("moviesMaster", JSON.stringify(movieMatches));
     localStorage.setItem("mkwMaster", JSON.stringify(movieKeywords));
     localStorage.setItem("selectionsMaster", JSON.stringify(mkwSelections));
+    localStorage.setItem("winnerMaster", JSON.stringify(winner));
 
 
     // call startupFunction
@@ -222,7 +227,6 @@ function buttonCheck(element, condition, fn){
         element.addEventListener("click", fn, { once:true });
     };
 };
-
 
 function stageUpFn(){
     baseCard.innerHTML='';
@@ -582,17 +586,23 @@ async function moviesCompiler(){
     function dumpProcessor(){
         movieDump.forEach((pullGroup)=>{
             pullGroup.package.value.results.forEach((movie)=>{
+                let yearSlice = movie.release_date.slice(0,4)
                 let movieObj = {
                     title: movie.title,
                     data: movie,
                     id: movie.id,
+                    poster: 'https://image.tmdb.org/t/p/w500'+movie.poster_path,
+                    posterCheck: movie.poster_path,
+                    altPlot: movie.overview,
+                    altYear: yearSlice,
                     score: 0,
                 }
                 
                 movieObj["titleSplit"]=splitAssign(movie.title);
                 movieObj["oTitleSplit"]=splitAssign(movie.original_title);
                 movieObj["plotSplit"]=splitAssign(movie.overview);
-                unifiedSplit=movieObj.titleSplit.concat(movieObj.oTitleSplit, movieObj.plotSplit);
+                // unifiedSplit=movieObj.titleSplit.concat(movieObj.oTitleSplit, movieObj.plotSplit);
+                unifiedSplit=movieObj.titleSplit.concat(movieObj.plotSplit);
                 movieObj["wordSoup"]=[...new Set(unifiedSplit)]
 
                 // console.log(movieObj);
@@ -725,6 +735,202 @@ function mkwTabulator(){
     //         mkwSluice.push(word);
     //     });
     // };
+};
+
+async function scoreTabulator(){
+    let storedKeywords = JSON.parse(localStorage.getItem("keywordsMaster"));
+    if (storedKeywords !== null){
+        keywordsRaw = storedKeywords;
+        storedKeywords.forEach((keyword)=>{
+            keyword["syns5"]=function(){
+                // console.log(this.syns)
+                if (this.syns.length<6){
+                    return this.syns;
+                } else {
+                    let synsDump =[];
+                    while(synsDump.length<5){
+                        let randSyn = Math.floor(Math.random()*this.syns.length);
+                        if (!synsDump.includes(this.syns[randSyn])){
+                            synsDump.push(this.syns[randSyn]);
+                        };
+                    };
+                    return synsDump;
+                };
+            }
+        })
+    };
+
+
+    let synsSluice=[];
+    let finalists = movieMatches.filter((movie)=>{
+        // console.log(movieMatches)
+        let isIncluded = false;
+        let onlySelectorWords = mkwSelections.map((item)=>{
+            return item.word;
+        });
+        onlySelectorWords.forEach((word)=>{
+            // console.log(movie.title)
+            // console.log(word)
+            // console.log(movie.wordSoup.includes[word])
+            if (movie.wordSoup.includes(word)){
+                isIncluded = true;
+            }
+        })
+        if (isIncluded){
+            return true;
+        } else{
+            return false;
+        };
+    })
+    console.log(finalists)
+
+
+    let selectedSluice = mkwSelections.map((mkw)=>{
+        return mkw.word
+    });
+    console.log(selectedSluice)
+    let primarySluice = keywordsRaw.map((wordGroup)=>{
+        return wordGroup.primary;
+    }).filter((word)=>{
+        if (selectedSluice.includes(word)){
+            return false;
+        } else{
+            return true;
+        };
+    });
+
+    primarySluice=[...new Set(primarySluice)];
+    // console.log(primarySluice)
+    // keywordsRaw
+    storedKeywords.forEach((wordGroup)=>{
+        if (wordGroup.syns.length<=5){
+            synsSluice=synsSluice.concat(wordGroup.syns)
+        } else {
+            synsSluice=synsSluice.concat(wordGroup.syns5())
+        }
+    });
+    synsSluice = [...new Set(synsSluice)].filter((word)=>{
+        if (primarySluice.includes(word)||selectedSluice.includes(word)){
+            return false;
+        } else {
+            return true;
+        };
+    });
+
+    
+
+    finalists.forEach((movie)=>{
+        let mkwPlotFiltered = movie.plotSplit.filter((word)=>{
+            if (movie.titleSplit.includes(word)){
+                return false;
+            } else{
+                return true;
+            }
+        })
+        let mkwScores = [[movie.titleSplit, 2], [mkwPlotFiltered, 1]];
+        let keywordScores = [[selectedSluice, 4], [primarySluice, 2], [synsSluice, 1]];
+        mkwScores.forEach((movieSplit)=>{
+            keywordScores.forEach((sluice)=>{
+                arrayChecker(movie, movieSplit, sluice)
+            });
+        });
+    });
+    finalists.sort(movieScoreCompare).reverse();
+    let highScore = finalists[0].score;
+    let winners = finalists.filter((movie)=>{
+        if (movie.score>=highScore){
+            return true;
+        } else {
+            return false;
+        };
+    });
+    console.log(winners)
+    console.log(winners.length)
+    console.log(winners[Math.floor(Math.random()*winners.length)])
+
+    if (winners.length===1){
+        winner=winners[0];
+    } else {
+        winner = winners[Math.floor(Math.random()*winners.length)]
+    };
+
+    // winnerProm = [];
+
+    // const addOmdbData= await fetch("https://api.themoviedb.org/3/movie/"+winner.id+"/external_ids?api_key=654175309f8dda54d6e0ea0c7706fa04")
+    // .then((response)=>{
+    //     if (response.status===200){
+    //         return response.json()
+    //     } else{
+    //         return "error"
+    //     }
+
+    // }).then((data)=>{
+    //     // fetch("http://www.omdbapi.com/?apikey=1aa15ab1&type=movie&plot=full&i="+data.imdb_id).then((response)=>{
+    //     //     if (response.status===200){
+    //     //         return response.json()
+    //     //     } else{
+    //     //         return "error"
+    //     //     }
+    
+    //     // }).then((data)=>{
+    //     //     winner["omdbData"]=data;
+    //     //     winner["fullPlot"]=data.Plot;
+    //     //     winner["year"]=data.Year;
+    //     //     winner["director"]=data.Director;
+    //     //     winner["cast"]=data.Actors;
+    //     //     // console.log(data.Ratings[1].value)
+    //     //     // winner["rtRating"]=data.Ratings[1].value;
+    //     // });
+    //     winnerProm.push(
+    //         fetch("http://www.omdbapi.com/?apikey=1aa15ab1&type=movie&plot=full&i="+data.imdb_id)
+    //         .then((response)=>{
+    //             if (response.status===200){
+    //                 return response.json()
+    //             } else{
+    //                 return "error"
+    //             };
+    //         }))
+        
+    // });
+    // const waitForWinner = await Promise.allSettled(winnerProm).then((data)=>{
+    //     winner["omdbData"]=data;
+    //     winner["fullPlot"]=data.Plot;
+    //     winner["year"]=data.Year;
+    //     winner["director"]=data.Director;
+    //     winner["cast"]=data.Actors;
+    //         // console.log(data.Ratings[1].value)
+    //         // winner["rtRating"]=data.Ratings[1].value;
+    // })
+    console.log(winner)
+
+    localStorage.setItem("winnerMaster", JSON.stringify(winner));
+
+    // console.log(finalists)
+    
+
+    function arrayChecker(movie, movieArray, keywordArray){
+        // let points = movieArray[1]+keywordArray[1];
+        let points = movieArray[1]*keywordArray[1];
+        movieArray[0].forEach((movieStr)=>{
+            keywordArray[0].forEach((keyword)=>{
+                if (movieStr.includes(keyword)){
+                    
+                    movie.score+=points;
+                    // console.log("Movie: "+movie.title)
+                    // console.log("Keyword: "+keyword)
+                    // console.log(movieArray[1], keywordArray[1])
+                    // console.log("Points: +"+points)
+                    // console.log("Score: "+movie.score)
+                    // console.log("Sluice")
+                    // console.log(keywordArray)
+                };
+            });
+        });
+    };
+
+    function movieScoreCompare(a, b){
+        return a.score-b.score;
+    };
 };
 
 
@@ -1316,6 +1522,11 @@ function renderInput(){
 };
 
 function renderPicker(){
+    let storedMatches = JSON.parse(localStorage.getItem("moviesMaster"));
+    if (storedMatches!==null){
+        console.log(storedMatches)
+        movieMatches=storedMatches;
+    };
     let storedMkwSelections=JSON.parse(localStorage.getItem("selectionsMaster"));
     if (storedMkwSelections!==null){
         console.log(storedMkwSelections)
@@ -1365,8 +1576,13 @@ function renderPicker(){
     baseCard.appendChild(titleCard);
     baseCard.appendChild(listBox);
 
-    function mkwButtonFn (){
+    async function mkwButtonFn (){
+        isLoading=true;
 
+        const waiting = await scoreTabulator();
+
+        isLoading=false;
+        stageUpFn();
     }
 
     function renderList(){
@@ -1418,6 +1634,169 @@ function renderPicker(){
     };
 };
 
+async function renderMovieCard(){
+    let storedWinner = JSON.parse(localStorage.getItem("winnerMaster"));
+    if (storedWinner!==null){
+        winner = storedWinner
+    };
+
+
+
+    winnerProm = [];
+    console.log(winner)
+    console.log(winner.id)
+    const addOmdbData= await fetch("https://api.themoviedb.org/3/movie/"+winner.id+"/external_ids?api_key=654175309f8dda54d6e0ea0c7706fa04")
+    .then((response)=>{
+        if (response.status===200){
+            return response.json()
+        } else{
+            return "error"
+        }
+
+    }).then((data)=>{
+        console.log(data)
+        if (data.imdb_id!==null){
+            winnerProm.push(
+                fetch("http://www.omdbapi.com/?apikey=1aa15ab1&type=movie&plot=full&i="+data.imdb_id)
+                .then((response)=>{
+                    if (response.status===200){
+                        return response.json()
+                    } else{
+                        return "error"
+                    };
+                }))
+        } else{
+            winner["omdbData"]="N/A";
+            winner["fullPlot"]="N/A";
+            winner["year"]=winner.altYear;
+            winner["director"]="N/A";
+            winner["cast"]="N/A";
+        }
+        
+        
+    });
+    const waitForWinner = await Promise.allSettled(winnerProm).then((data)=>{
+        console.log(data)
+        winner["omdbData"]=data[0].value;
+        winner["fullPlot"]=data[0].value.Plot;
+        winner["year"]=data[0].value.Year;
+        winner["director"]=data[0].value.Director;
+        winner["cast"]=data[0].value.Actors;
+    })
+    console.log(winner)
+    // let plot = (movie)=>{
+    //     console.log(movie)
+    //     // if (movie.fullPlot===undefined){
+    //     //     return movie.altPlot;
+    //     // }
+    //     plotCheck = textSplit(movie.fullPlot)
+    //     if (plotCheck.length>5){
+    //         return movie.fullPlot;
+    //     } else{
+    //         return movie.altPlot;
+    //     };
+    // };
+
+    let fullCard = document.createElement("div");
+    let sideCard = document.createElement("div");
+
+    let moviePoster = document.createElement("img");
+    let noPoster = document.createElement("div");
+
+    let detailsCard = document.createElement("div");
+    let titleDiv = document.createElement("div");
+    let movieTitle = document.createElement("h4");
+    
+    let directorDiv = document.createElement("div");
+    let directorLabel = document.createElement("h5");
+    let directorText = document.createElement("p");
+
+    let castDiv = document.createElement("div");
+    let castLabel = document.createElement("h5");
+    let castText = document.createElement("p");
+
+    let plotDiv = document.createElement("div");
+    let plotText = document.createElement("p");
+
+    fullCard.setAttribute("class", "fullCard");
+    sideCard.setAttribute("class", "sideCard")
+
+
+    moviePoster.setAttribute("src", winner.poster);
+    moviePoster.setAttribute("alt", winner.title+" Poster");
+
+    movieTitle.setAttribute("class", "h4");
+
+    titleDiv.setAttribute("class", "textSection");
+    directorDiv.setAttribute("class", "textSection");
+    castDiv.setAttribute("class", "textSection");
+
+    directorLabel.setAttribute("class", "h5");
+    castLabel.setAttribute("class", "h5");
+
+    plotDiv.setAttribute("class", "plotDiv")
+
+    if (winner.posterCheck!=="N/A"){
+        moviePoster.setAttribute("class", "poster");
+    } else {
+        moviePoster.setAttribute("class", "nv");
+    }
+   
+    noPoster.setAttribute("class", "noPoster");
+    noPoster.textContent = "Poster Not Found"
+    
+    
+
+    directorLabel.textContent="Directed by:";
+    directorText.textContent = winner.director;
+    castLabel.textContent="Cast:";
+    castText.textContent=winner.cast;
+
+    if (winner.fullPlot!==undefined&&winner.fullPlot!=="N/A"){
+        plotText.textContent=winner.fullPlot;
+    } else {
+        plotText.textContent=winner.altPlot;
+    }
+    
+    // if (movie.year!==undefined){
+    //     movieTitle.textContent = winner.title+" ("+winner.year+")";
+    // } else{
+    //     movieTitle.textContent = winner.title+" ("+winner.altYear+")";
+    // };
+
+    movieTitle.textContent = winner.title+" ("+winner.year+")";
+    
+
+
+    castDiv.appendChild(castLabel);
+    castDiv.appendChild(castText);
+    
+    directorDiv.appendChild(directorLabel);
+    directorDiv.appendChild(directorText);
+
+    titleDiv.appendChild(movieTitle);
+
+    detailsCard.appendChild(titleDiv);
+    detailsCard.appendChild(directorDiv);
+    detailsCard.appendChild(castDiv);
+
+    plotDiv.appendChild(plotText);
+
+    sideCard.appendChild(detailsCard);
+    sideCard.appendChild(plotDiv);
+
+    if (winner.posterCheck!=="N/A"){
+        fullCard.appendChild(moviePoster);
+    } else {
+        noPoster.appendChild(moviePoster);
+        fullCard.appendChild(noPoster);
+    };
+    
+    fullCard.appendChild(sideCard);
+
+    baseCard.appendChild(fullCard);
+}
+
 function renderLoad(){
     setTimeout(()=>{
         if (isLoading){
@@ -1468,595 +1847,6 @@ function renderLoad(){
     }, 500);
 };
 
-
-
-// fetch("https://emojihub.yurace.pro/api/all")
-//     .then((response)=>{
-//         if (response.status===200){
-//             return response.json();
-//         }
-//     })
-//     .then((data)=>{
-//         console.log(data);
-//     })
-// let bub = [];
-// let testVar=0;
-let omdbTest=[];
-let rtUrl = null;
-let omdbUrl = "http://www.omdbapi.com/?apikey=1aa15ab1&type=movie&plot=full&s=$comedy";
-// omdbUrl = "http://www.omdbapi.com/?apikey=1aa15ab1&type=movie&plot=full&s=$comedy";
-// fetch(omdbUrl)
-//     .then((response)=>{
-//         if (response.status===200){
-//             return response.json();
-//         }
-//     })
-//     .then((data)=>{
-//         console.log(data)
-//         let w =0;
-//         for (let i=0; i<data.Search.length; i++){
-//             let titleFix = data.Search[i].Title.replace(/\s/g, '+');
-//             fetch("http://www.omdbapi.com/?apikey=1aa15ab1&type=movie&plot=full&t="+titleFix)
-//             .then((response)=>{
-//                 if (response.status===200){
-//                     return response.json();
-//                 } else{
-//                     console.log("Ya fucked it.")
-//                 }
-//             })
-//             .then((data)=>{
-//                 if (data.Plot.includes("not")){
-//                     omdbTest.push(data);
-                    
-//                 }
-                
-//             })
-//             // console.log(w)
-//         }
-        
-//     }).then(()=>{console.log(omdbTest);})
-
-// function allResultsOMDB(object){
-//     let remainder = object.totalResults%10;
-//     let pages = ()=>{
-//         if (remainder===0){
-//             return object.totalResults/10;
-//         } else {
-//             return ((object.totalResults-remainder)/10)+1
-//         };
-//     };
-
-//     let promiseList1 =[]
-//     let promiseList2 =[]
-//     for (let i=0; i<pages(); i++){
-        
-//         let x = i+1;
-//         omdbUrl = "http://www.omdbapi.com/?apikey=1aa15ab1&type=movie&plot=full&tomatoes=true&page="+x+"&s=$comedy";
-//         let testPromise = fetch(omdbUrl)
-//             .then((response)=>{
-//                 if (response.status===200){
-//                     return response.json();
-//                 }
-//             })
-//             .then((data)=>{
-//                 // omdbTest.push(data.response);
-//                 promiseList1.push(testPromise);
-//             })
-//     }
-//     return new Promise((resolve) => {
-//         Promise.all(promiseList1)
-//           .then((proms) =>
-//             proms.forEach((p) => promiseList2.push({
-//               results: p.results
-//             }))
-//           )
-//           .then(() => resolve(promiseList2));
-//       });
-// };
-
-// fetch("https://emojihub.yurace.pro/api/random/category/smileys-and-people")
-//     .then((response)=>{
-//         if (response.status===200){
-//             return response.json();
-//         }
-//     })
-//     .then((data)=>{
-//         console.log(data);
-//     })
-
-// moviedb key=654175309f8dda54d6e0ea0c7706fa04
-
-// let mdbUrl = 'https://api.themoviedb.org/3/discover/movie?include_adult=false&include_video=false&language=en-US&page=1&sort_by=popularity.desc&with_keywords=horror&api_key=654175309f8dda54d6e0ea0c7706fa04';
-// let mdbUrl = 'https://api.themoviedb.org/3/discover/movie?api_key=654175309f8dda54d6e0ea0c7706fa04&include_adult=false&include_video=false&language=en-US&sort_by=popularity.desc&page=1';
-// let mdbUrl = "https://api.themoviedb.org/3/search/keyword?api_key=654175309f8dda54d6e0ea0c7706fa04&query=alligator"
-// mdbUrl='https://api.themoviedb.org/3/genre/movie/list?language=en&api_key=654175309f8dda54d6e0ea0c7706fa04'
-// mdbUrl='https://api.themoviedb.org/3/discover/movie?include_adult=false&include_video=false&language=en-US&page=1&sort_by=popularity.desc&api_key=654175309f8dda54d6e0ea0c7706fa04'
-// mdbUrl = 'https://api.themoviedb.org/3/discover/movie?include_adult=false&include_video=false&language=en-US&page=1&sort_by=popularity.desc&with_genres=10770%2C53&api_key=654175309f8dda54d6e0ea0c7706fa04'
-// mdbUrl = "https://api.themoviedb.org/3/discover/movie?query=alligator&include_adult=false&include_video=false&language=en-US&page=1&sort_by=popularity.desc&api_key=654175309f8dda54d6e0ea0c7706fa04"
-// let testArray = [];
-// fetch(mdbUrl)
-//     .then((response)=>{
-//         if (response.status===200){
-//             return response.json();
-//         }
-//     })
-//     .then((data)=>{
-//         testArray.push(data)
-//         mdbParseResults(data.total_pages, testArray, "prison", "https://api.themoviedb.org/3/discover/movie?api_key=654175309f8dda54d6e0ea0c7706fa04&include_adult=false&include_video=false&language=en-US&sort_by=popularity.desc&with_genres=10770%2C53&page=")
-//     })
-// function mdbParseResults(pages, array, keyword, url){
-//     let x=0;
-//     for (let i=0; i<pages; i++){
-//         x = i+1;
-//         genUrl = url+x;
-//         fetch(genUrl)
-//             .then((response)=>{
-//                 if (response.status===200){
-//                     return response.json();
-//                 };
-//             })
-//             .then((data)=>{
-//                 array.push("bub")
-//             })
-//     }
-// };
-
-// function mdbParseResults(pages, array, keyword, url){
-//     let x=0;
-//     for (let i=0; i<pages; i++){
-//         x = i+1;
-//         genUrl = url+x;
-//         fetch(genUrl)
-//             .then((response)=>{
-//                 if (response.status===200){
-//                     return response.json();
-//                 };
-//             })
-//             .then((data)=>{
-//                 array.push("bub")
-                
-//                 // This is also specific to themoviedb because object keys can't be passed as arguments
-//                 for (let n=0; n<data.results.length; n++){
-//                     // genArray(data.results[i]);
-//                     // if (data.results[n].overview!==undefined&&data.results[n].hasOwnProperty("overview")){
-//                     // }
-                    
-//                     if (data.results[n].overview.includes(keyword)){
-//                         // testArray.push(data.results[n]);
-//                         // testArray.push("bub");
-//                     }
-//                 };
-//             })
-//     }
-//     // function genArray(object){
-//     //     // Gotta get specific for each api call
-//         // if (object.overview.includes(keyword)){
-//         //     array.push(object);
-//         // }
-//     // }
-// };
-
-
-
-// function tabulateResults(data, totalResults, limit, array, keyword, url){
-//     let remainder = data.%limit;
-//     let pages = ()=>{
-//         if (remainder===0){
-//             return data.totalResults/limit;
-//         } else {
-//             return ((data.totalResults-remainder)/limit)+1
-//         };
-//     };
-
-//     for (let i=0; i<pages(); i++){
-//         let x = i+1;
-//         genUrl = url+x;
-//         fetch(genUrl)
-//             .then((response)=>{
-//                 if (response.status===200){
-//                     return response.json();
-//                 }
-//             })
-//             .then((data)=>{
-                
-//                 // This is also specific to themoviedb because object keys can't be passed as arguments
-//                 for (let i=0; i<limit; i++)
-//                     genArray(data.results[i]);
-//             })
-//     }
-//     function genArray(object){
-//         // Gotta get specific for each api call
-//         if (object.overview.includes(keyword)){
-//             array.push(object);
-//         }
-//     }
-// };
-
-
-
-
-// fetch("https://api.dictionaryapi.dev/api/v2/entries/en/punch")
-//     .then((response)=>{
-//         if (response.status ===200){
-//             return response.json()
-//         };
-        
-//         })
-//     .then((data)=>{console.log(data)})
-
-let testWords = ["apple", "orange", "sparrow", "fork"];
-let testPush =[];
-
-function testFetch(word){
-    fetch("https://api.dictionaryapi.dev/api/v2/entries/en/"+word)
-        .then((response)=>{
-            if (response.status===200){
-                return response.json();
-            }
-        })
-        .then((data)=>{
-            console.log(data)
-            return data;
-            // testPush.push(data)
-        });
-}
-async function testFn(){
-    // const result = await testFetch(testWords[0]);
-    // console.log(testPush)
-    for (let i=0; i<testWords.length; i++){
-        const result = await fetch("https://api.dictionaryapi.dev/api/v2/entries/en/"+testWords[i])
-            .then((response)=>{
-                if (response.status===200){
-                    return response.json();
-                };
-            })
-            .then((data)=>{
-                // console.log(data)
-                // return data;
-                testPush.push(data)
-            });
-    }
-    
-    // console.log(testPush.length)
-};
-testFn();
-
-// function movieFetch(movie){
-//     let movieTitle = ()=>{
-//         if (movie.includes(" ")){
-//             return movie.replace((/\s/g, '%2B'));
-//         } else{
-//             return movie;
-//         }
-//     };
-//     fetch('https://api.themoviedb.org/3/search/movie?api_key=654175309f8dda54d6e0ea0c7706fa04&include_adult=false&language=en-US&page=1&query='+movieTitle())
-//     .then((response)=>{
-//         if (response.status===200){
-//             return response.json();
-//         }
-//     })
-//     .then((data)=>{
-//         console.log(data)
-//     });
-// };
-// movieFetch("##Your Movie");
-
-
-// fetch("https://api.dictionaryapi.dev/api/v2/entries/en/savouring").then((response)=>{
-//     console.log("hubba")
-//     if (response.status===200){
-//         return response.json();
-//     } else {
-//         console.log("Vegetables: the forbidden fruit.")
-//     }
-// }).then((data)=>{
-//     console.log(data)
-// });
-
-
-
-
-
-
-fetch("https://api.themoviedb.org/3/search/movie?api_key=654175309f8dda54d6e0ea0c7706fa04&include_adult=false&include_video=false&language=en-US&page=1&sort_by=popularity.desc&query=alligator")
-.then((response)=>{
-    if (response.status===200){
-        return response.json();
-    }
-}).then((data)=>{
-    console.log(data);
-    // console.log(data.results[0].overview)
-    // fetch("https://api.themoviedb.org/3/movie/"+data.results[0].id+"/external_ids?api_key=654175309f8dda54d6e0ea0c7706fa04")
-    // .then((response)=>{
-    //     if (response.status===200){
-    //         return response.json()
-    //     } else{
-    //         return "error"
-    //     }
-
-    // }).then((data)=>{
-    //     // console.log(data)
-    //     fetch("http://www.omdbapi.com/?apikey=1aa15ab1&type=movie&plot=full&i="+data.imdb_id).then((response)=>{
-    //         if (response.status===200){
-    //             return response.json()
-    //         } else{
-    //             return "error"
-    //         }
-    
-    //     }).then((data)=>{
-    //         console.log(data)
-    //         console.log(data.Plot)
-    //     })
-    // })
-})
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 function fetchTMDB() {
     fetch("https://api.themoviedb.org/3/movie/1491?api_key=654175309f8dda54d6e0ea0c7706fa04&language=en-US")
       .then((response) => {
@@ -2074,25 +1864,22 @@ function fetchTMDB() {
       });
   }
   
-  function renderTMDB(movieData) {
-    let { title, poster_path, overview } = movieData;
-    //this is the base url for all posters... it adds poster_path data to the end and grabs the poster for the movie
-    let basePosterURL = 'https://image.tmdb.org/t/p/w500';
-    let tmdbContainer = document.createElement('div');
-    document.body.appendChild(tmdbContainer); // Append to the document body
-  
-    tmdbContainer.classList.add('container', 'movie');
-    tmdbContainer.innerHTML = `
-      <img src="${basePosterURL + poster_path}" alt="${title}">
-      <div class='movie-title'>
-        <h1>${title}</h1>
-      </div>
-      <div class="overview">
-        <h2>Plot</h2>
-        ${overview}
-      </div>
-    `;
-  }
+function renderTMDB(movieData) {
+let { title, poster_path, overview } = movieData;
+//this is the base url for all posters... it adds poster_path data to the end and grabs the poster for the movie
+let basePosterURL = 'https://image.tmdb.org/t/p/w500';
+let tmdbContainer = document.createElement('div');
+document.body.appendChild(tmdbContainer); // Append to the document body
 
-
-
+tmdbContainer.classList.add('container', 'movie');
+tmdbContainer.innerHTML = `
+    <img src="${basePosterURL + poster_path}" alt="${title}">
+    <div class='movie-title'>
+    <h1>${title}</h1>
+    </div>
+    <div class="overview">
+    <h2>Plot</h2>
+    ${overview}
+    </div>
+`;
+}
