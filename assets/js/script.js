@@ -109,7 +109,7 @@ let bugWordsRaw = [
     ["dishware", ["silverware", "fork", "forks", "spoon", "spoons", "knife", "knives", "plate", "plates", "dishes", "dish", "food", "dining", "dinner", "tablecloth"]],
     ["Israel", ["Israeli", "Middle East", "Holy", "Judaism", "Islam", "Christianity", "Jerusalem"]],
     ["Israeli", ["Israel", "Middle East", "Holy", "Jerusalem"]],
-    ["Chocolate"]
+    ["fencer", ["fencing", "sword", "spot", "athlete"]]
 ];
 let bugObjects = bugWordsRaw.map((word)=>{
     let bwObj ={
@@ -532,17 +532,20 @@ async function moviesCompiler(){
         // console.log("Initial Promises")
         // console.log(movieProms)
         const waitProms = await Promise.allSettled(movieProms).then((data)=>{
-            // let idFloat = [];
-            // if (moviesFloat>0){
-            //     idFloat=moviesFloat.map((movie))
-            // }
-            let mTest = 0;
-            let aTest =0;
             data.forEach((pull)=>{
                 
                 let titleWord = titleWords[data.indexOf(pull)]
                 if (pull.value.total_pages>1){
-                    let rando = Math.ceil(Math.random()*pull.value.total_pages);
+                    let popValue= 3;
+                    let actualValue=()=>{
+                        if (pull.value.total_pages>=popValue){
+                            return popValue;
+                        } else{
+                            return pull.value.total_pages;
+                        }
+                    }
+                    // let rando = Math.ceil(Math.random()*pull.value.total_pages);
+                    let rando = Math.ceil(Math.random()*actualValue());
                     let valueProm = moviePull(titleWord, rando);
                     // Let's see if I can set an object's property to a promise,
                     // Then push that object into an array
@@ -637,7 +640,7 @@ async function moviesCompiler(){
         // console.log("Pull Check:")
         // console.log(word)
         // console.log(page)
-        let movieUrl = "https://api.themoviedb.org/3/search/movie?api_key=654175309f8dda54d6e0ea0c7706fa04&include_adult=false&include_video=false&language=en-US&page=1&sort_by=popularity.desc&query="+word+"&page="+page;
+        let movieUrl = "https://api.themoviedb.org/3/search/movie?api_key=654175309f8dda54d6e0ea0c7706fa04&include_adult=false&include_video=false&language=en-US&page=1&sort_by=popularity.desc&query="+word+"&page="+page+"&without_genres=99";
         // console.log(movieUrl)
         // array.push(fetch(movieUrl).then((response)=>{
         return fetch(movieUrl).then((response)=>{
@@ -1640,63 +1643,6 @@ async function renderMovieCard(){
         winner = storedWinner
     };
 
-
-
-    // winnerProm = [];
-    // console.log(winner)
-    // console.log(winner.id)
-    // const addOmdbData= await fetch("https://api.themoviedb.org/3/movie/"+winner.id+"/external_ids?api_key=654175309f8dda54d6e0ea0c7706fa04")
-    // .then((response)=>{
-    //     if (response.status===200){
-    //         return response.json()
-    //     } else{
-    //         return "error"
-    //     }
-
-    // }).then((data)=>{
-    //     console.log(data)
-    //     if (data.imdb_id!==null){
-    //         winnerProm.push(
-    //             fetch("http://www.omdbapi.com/?apikey=1aa15ab1&type=movie&plot=full&i="+data.imdb_id)
-    //             .then((response)=>{
-    //                 if (response.status===200){
-    //                     return response.json()
-    //                 } else{
-    //                     return "error"
-    //                 };
-    //             }))
-    //     } else{
-    //         winner["omdbData"]="N/A";
-    //         winner["fullPlot"]="N/A";
-    //         winner["year"]=winner.altYear;
-    //         winner["director"]="N/A";
-    //         winner["cast"]="N/A";
-    //     }
-        
-        
-    // });
-    // const waitForWinner = await Promise.allSettled(winnerProm).then((data)=>{
-    //     console.log(data)
-    //     winner["omdbData"]=data[0].value;
-    //     winner["fullPlot"]=data[0].value.Plot;
-    //     winner["year"]=data[0].value.Year;
-    //     winner["director"]=data[0].value.Director;
-    //     winner["cast"]=data[0].value.Actors;
-    // })
-    // console.log(winner)
-    // let plot = (movie)=>{
-    //     console.log(movie)
-    //     // if (movie.fullPlot===undefined){
-    //     //     return movie.altPlot;
-    //     // }
-    //     plotCheck = textSplit(movie.fullPlot)
-    //     if (plotCheck.length>5){
-    //         return movie.fullPlot;
-    //     } else{
-    //         return movie.altPlot;
-    //     };
-    // };
-
     let fullCard = document.createElement("div");
     let sideCard = document.createElement("div");
 
@@ -1883,3 +1829,11 @@ tmdbContainer.innerHTML = `
     </div>
 `;
 }
+
+
+
+// fetch("https://api.themoviedb.org/3/genre/movie/list?api_key=654175309f8dda54d6e0ea0c7706fa04&language=en-US").then((response)=>{
+//     if (response.status===200){
+//         return response.json()
+//     }
+// }).then((data)=>{console.log(data)})
