@@ -83,6 +83,7 @@ let userInputRaw = "";
 let movieMatches = [];
 let movieKeywords =[];
 let mkwSelections = [];
+let winner = null;
 // /Local Storage Variables
 
 let keywordSluice = [];
@@ -158,7 +159,7 @@ resetButton.addEventListener("click", resetButtonFn);
 renderSmiley();
 stageFunction();
 
-// Misc. FUnctions
+// Misc. Functions
 function colorChange(){
     for (let i=0; i<ColorVar.instances.length; i++){
         ColorVar.instances[i].changeFn();
@@ -184,6 +185,8 @@ function resetButtonFn(){
 
     baseCard.innerHTML = '';
 
+    isLoading = false;
+
     stage = 0;
     // emojiNum = 0;
     chosenEmojis = [];
@@ -194,6 +197,7 @@ function resetButtonFn(){
     movieMatches =[];
     movieKeywords =[];
     mkwSelections = [];
+    winner = null;
     
     
     localStorage.setItem("stageMaster", JSON.stringify(stage));
@@ -203,9 +207,10 @@ function resetButtonFn(){
     localStorage.setItem("keywordsMaster", JSON.stringify(keywordsRaw));
     localStorage.setItem("questionMaster", JSON.stringify(currentQuestion));
     localStorage.setItem("inputMaster", JSON.stringify(userInputRaw));
-    localStorage.setItem("moviestMaster", JSON.stringify(movieMatches));
+    localStorage.setItem("moviesMaster", JSON.stringify(movieMatches));
     localStorage.setItem("mkwMaster", JSON.stringify(movieKeywords));
     localStorage.setItem("selectionsMaster", JSON.stringify(mkwSelections));
+    localStorage.setItem("winnerMaster", JSON.stringify(winner));
 
 
     // call startupFunction
@@ -222,7 +227,6 @@ function buttonCheck(element, condition, fn){
         element.addEventListener("click", fn, { once:true });
     };
 };
-
 
 function stageUpFn(){
     baseCard.innerHTML='';
@@ -586,13 +590,16 @@ async function moviesCompiler(){
                     title: movie.title,
                     data: movie,
                     id: movie.id,
+                    poster: movie.poster_path,
+                    altPlot: movie.overview,
                     score: 0,
                 }
                 
                 movieObj["titleSplit"]=splitAssign(movie.title);
                 movieObj["oTitleSplit"]=splitAssign(movie.original_title);
                 movieObj["plotSplit"]=splitAssign(movie.overview);
-                unifiedSplit=movieObj.titleSplit.concat(movieObj.oTitleSplit, movieObj.plotSplit);
+                // unifiedSplit=movieObj.titleSplit.concat(movieObj.oTitleSplit, movieObj.plotSplit);
+                unifiedSplit=movieObj.titleSplit.concat(movieObj.plotSplit);
                 movieObj["wordSoup"]=[...new Set(unifiedSplit)]
 
                 // console.log(movieObj);
@@ -725,6 +732,181 @@ function mkwTabulator(){
     //         mkwSluice.push(word);
     //     });
     // };
+};
+
+async function scoreTabulator(){
+    let storedKeywords = JSON.parse(localStorage.getItem("keywordsMaster"));
+    if (storedKeywords !== null){
+        keywordsRaw = storedKeywords;
+        storedKeywords.forEach((keyword)=>{
+            keyword["syns5"]=function(){
+                // console.log(this.syns)
+                if (this.syns.length<6){
+                    return this.syns;
+                } else {
+                    let synsDump =[];
+                    while(synsDump.length<5){
+                        let randSyn = Math.floor(Math.random()*this.syns.length);
+                        if (!synsDump.includes(this.syns[randSyn])){
+                            synsDump.push(this.syns[randSyn]);
+                        };
+                    };
+                    return synsDump;
+                };
+            }
+        })
+    };
+
+
+    let synsSluice=[];
+    let finalists = movieMatches.filter((movie)=>{
+        // console.log(movieMatches)
+        let isIncluded = false;
+        let onlySelectorWords = mkwSelections.map((item)=>{
+            return item.word;
+        });
+        onlySelectorWords.forEach((word)=>{
+            // console.log(movie.title)
+            // console.log(word)
+            // console.log(movie.wordSoup.includes[word])
+            if (movie.wordSoup.includes(word)){
+                isIncluded = true;
+            }
+        })
+        if (isIncluded){
+            return true;
+        } else{
+            return false;
+        };
+    })
+    console.log(finalists)
+
+
+    let selectedSluice = mkwSelections.map((mkw)=>{
+        return mkw.word
+    });
+    console.log(selectedSluice)
+    let primarySluice = keywordsRaw.map((wordGroup)=>{
+        return wordGroup.primary;
+    }).filter((word)=>{
+        if (selectedSluice.includes(word)){
+            return false;
+        } else{
+            return true;
+        };
+    });
+
+    primarySluice=[...new Set(primarySluice)];
+    // console.log(primarySluice)
+    // keywordsRaw
+    storedKeywords.forEach((wordGroup)=>{
+        if (wordGroup.syns.length<=5){
+            synsSluice=synsSluice.concat(wordGroup.syns)
+        } else {
+            synsSluice=synsSluice.concat(wordGroup.syns5())
+        }
+    });
+    synsSluice = [...new Set(synsSluice)].filter((word)=>{
+        if (primarySluice.includes(word)||selectedSluice.includes(word)){
+            return false;
+        } else {
+            return true;
+        };
+    });
+
+    
+
+    finalists.forEach((movie)=>{
+        let mkwPlotFiltered = movie.plotSplit.filter((word)=>{
+            if (movie.titleSplit.includes(word)){
+                return false;
+            } else{
+                return true;
+            }
+        })
+        let mkwScores = [[movie.titleSplit, 2], [mkwPlotFiltered, 1]];
+        let keywordScores = [[selectedSluice, 4], [primarySluice, 2], [synsSluice, 1]];
+        mkwScores.forEach((movieSplit)=>{
+            keywordScores.forEach((sluice)=>{
+                arrayChecker(movie, movieSplit, sluice)
+            });
+        });
+    });
+    finalists.sort(movieScoreCompare).reverse();
+    let highScore = finalists[0].score;
+    let winners = finalists.filter((movie)=>{
+        if (movie.score>=highScore){
+            return true;
+        } else {
+            return false;
+        };
+    });
+    console.log(winners)
+    console.log(winners.length)
+    console.log(winners[Math.floor(Math.random()*winners.length)])
+
+    if (winners.length===1){
+        winner=winners[0];
+    } else {
+        winner = winners[Math.floor(Math.random()*winners.length)]
+    };
+
+    const addOmdbData= await fetch("https://api.themoviedb.org/3/movie/"+winner.id+"/external_ids?api_key=654175309f8dda54d6e0ea0c7706fa04")
+    .then((response)=>{
+        if (response.status===200){
+            return response.json()
+        } else{
+            return "error"
+        }
+
+    }).then((data)=>{
+        fetch("http://www.omdbapi.com/?apikey=1aa15ab1&type=movie&plot=full&i="+data.imdb_id).then((response)=>{
+            if (response.status===200){
+                return response.json()
+            } else{
+                return "error"
+            }
+    
+        }).then((data)=>{
+            winner["omdbData"]=data;
+            winner["fullPlot"]=data.Plot;
+            winner["year"]=data.Year;
+            winner["director"]=data.Director;
+            winner["cast"]=data.Actors;
+            // console.log(data.Ratings[1].value)
+            // winner["rtRating"]=data.Ratings[1].value;
+        });
+    });
+    console.log(winner)
+
+    localStorage.setItem("winnerMaster", JSON.stringify(winner));
+
+    // console.log(finalists)
+    
+
+    function arrayChecker(movie, movieArray, keywordArray){
+        // let points = movieArray[1]+keywordArray[1];
+        let points = movieArray[1]*keywordArray[1];
+        movieArray[0].forEach((movieStr)=>{
+            keywordArray[0].forEach((keyword)=>{
+                if (movieStr.includes(keyword)){
+                    
+                    movie.score+=points;
+                    // console.log("Movie: "+movie.title)
+                    // console.log("Keyword: "+keyword)
+                    // console.log(movieArray[1], keywordArray[1])
+                    // console.log("Points: +"+points)
+                    // console.log("Score: "+movie.score)
+                    // console.log("Sluice")
+                    // console.log(keywordArray)
+                };
+            });
+        });
+    };
+
+    function movieScoreCompare(a, b){
+        return a.score-b.score;
+    };
 };
 
 
@@ -1316,6 +1498,11 @@ function renderInput(){
 };
 
 function renderPicker(){
+    let storedMatches = JSON.parse(localStorage.getItem("moviesMaster"));
+    if (storedMatches!==null){
+        console.log(storedMatches)
+        movieMatches=storedMatches;
+    };
     let storedMkwSelections=JSON.parse(localStorage.getItem("selectionsMaster"));
     if (storedMkwSelections!==null){
         console.log(storedMkwSelections)
@@ -1365,8 +1552,12 @@ function renderPicker(){
     baseCard.appendChild(titleCard);
     baseCard.appendChild(listBox);
 
-    function mkwButtonFn (){
+    async function mkwButtonFn (){
+        isLoading=true;
+        
+        const waiting = await scoreTabulator();
 
+        isLoading=false;
     }
 
     function renderList(){
