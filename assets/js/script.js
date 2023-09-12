@@ -1,8 +1,5 @@
 let rootEl = document.querySelector(":root");
 let bodyEl = document.querySelector("#body");
-// let stopEl = document.querySelector("#stop");
-// let pauseEl = document.querySelector("#pause");
-// let playEl = document.querySelector("#play");
 let colorSwitchEl = document.querySelector("#colorSwitch");
 let playPauseEl = document.querySelector("#play-pause");
 
@@ -12,10 +9,8 @@ class ColorVar {
         this.label = label;
         this.oCode = oCode;
         ColorVar.instances.push(this);
-        // this.paused = false; // Add a 'paused' property to track the pause state
     }
     changeFn() {
-        // if (this.paused) return; // Check if the color change is paused
         let rVal = () => {
             return Math.floor(Math.random() * 255);
         };
@@ -27,10 +22,7 @@ class ColorVar {
     }
     cResetFn() {
         document.body.style.setProperty(this.label, this.oCode);
-    }
-    // togglePause() {
-    //     this.paused = !this.paused; // Toggle the 'paused' state
-    // }
+    };
 }
 
 const color1 = new ColorVar("--color1", "#b4e8b4");
@@ -116,7 +108,6 @@ let bugObjects = bugWordsRaw.map((word)=>{
         primary: word[0],
         syns: word[1],
         syns5: function(){
-            // console.log(this.syns)
             if (this.syns.length<6){
                 return this.syns;
             } else {
@@ -136,7 +127,6 @@ let bugObjects = bugWordsRaw.map((word)=>{
 let bugWords = bugWordsRaw.map((word)=>{
     return word[0].toUpperCase();
 });
-// let emojiNum = 0;
 
 let stageArray = [renderStart, renderEmojis, renderInput, renderPicker, renderMovieCard];
 
@@ -175,20 +165,12 @@ function stageFunction(){
 };
 
 function resetButtonFn(){
-    
-    // JSON List:
-    // stage (number) - stageMaster
-    // emojiNum (number) - eNumMaster
-    // chosenEmojis (array) - emojisMaster
-    // eligibleEmojis (array) - eligibleMaster
-    // more to come
 
     baseCard.innerHTML = '';
 
     isLoading = false;
 
     stage = 0;
-    // emojiNum = 0;
     chosenEmojis = [];
     eligibleEmojis = [];
     keywordsRaw = [];
@@ -201,7 +183,6 @@ function resetButtonFn(){
     
     
     localStorage.setItem("stageMaster", JSON.stringify(stage));
-    // localStorage.setItem("eNumMaster", JSON.stringify(emojiNum));
     localStorage.setItem("emojisMaster", JSON.stringify(chosenEmojis));
     localStorage.setItem("eligibleMaster", JSON.stringify(eligibleEmojis));
     localStorage.setItem("keywordsMaster", JSON.stringify(keywordsRaw));
@@ -212,8 +193,6 @@ function resetButtonFn(){
     localStorage.setItem("selectionsMaster", JSON.stringify(mkwSelections));
     localStorage.setItem("winnerMaster", JSON.stringify(winner));
 
-
-    // call startupFunction
     
     stageFunction();
 };
@@ -236,18 +215,6 @@ function stageUpFn(){
 };
 
 function textSplit(str){
-    // let floatArray = str.split(/\s/g);
-    // let symbols =["`","~", "!", "@", "#", "$", "%", "^", "&", "*", "(", ")", "-", "_", "=", "+", "[", "]", "{", "}", "|", ",", "<", ">", ".", "/", "?", ";", ":", '"', "'"];
-    // // console.log(floatCount)
-    // floatArray = floatArray.filter((word)=>{
-    //     if (word !== ""&&!symbols.includes(word)){
-    //         return true;
-    //     } else {
-    //         return false;
-    //     }
-    // })
-    // // console.log(floatCount)
-    // return floatArray;
     let floatArray = str.split(" ");
     floatArray = floatArray.map((word)=>{
         word = word.replace(/'t/gi, "qxqxqx");
@@ -270,14 +237,13 @@ function textSplit(str){
 async function wordParser(str){
 
 
-    // console.log(str)
+    
     let keywordsFloat = [];
     let storedKeywords = JSON.parse(localStorage.getItem("keywordsMaster"));
     if (storedKeywords !== null){
         keywordsRaw = storedKeywords;
         storedKeywords.forEach((keyword)=>{
             keyword["syns5"]=function(){
-                // console.log(this.syns)
                 if (this.syns.length<6){
                     return this.syns;
                 } else {
@@ -290,44 +256,17 @@ async function wordParser(str){
                     };
                     return synsDump;
                 };
-            }
+            };
         })
     };
 
     let primaryArray = keywordsRaw.map((kwObj)=>{
         return kwObj.primary;
-    })
-
-    // let puncFn = (word)=>{
-    //     let newWord = "";
-    //     for (let n=0; n<word.length; n++){
-    //         if (word[n]!=="."&&word[n]!==","&&word[n]!=="'"){
-    //             newWord+=word[n];
-    //         };
-    //     };
-    //     return newWord;
-    // };
-    // let splitArray = str.split(" ");
-
-    // splitArray.push("Christmas")
-    // console.log(splitArray)
-    // splitArray = splitArray.map((word)=>{
-    //     word=word.replace(/'s/g, "");
-    //     word=word.replace(/\d/g, "");
-    //     word=word.replace(/\W/g," ");
-    //     return word.split(" ").filter((char)=>{
-    //         if (char!==""){
-    //         return true;
-    //         } else{
-    //             return false;
-    //         }
-    //     })
-    // }).flat();
+    });
 
     let splitArray = textSplit(str);
     
     for (let i=0; i<splitArray.length; i++){
-        // splitArray[i] = puncFn(splitArray[i]);
         if (bugWords.includes(splitArray[i].toUpperCase())){
             // let keywordObj = createKWObj(splitArray[i]);
             // keywordSluice.push(splitArray[i].toUpperCase());
@@ -356,7 +295,6 @@ async function wordParser(str){
                 return "error";
             };
         }))
-    // console.log(keywordsFloat)
 
     const waitTest = await Promise.allSettled(promisesFloat).then((response)=>{
         
@@ -374,7 +312,6 @@ async function wordParser(str){
         });
         
         for (let i=0; i<results.length; i++){
-            // let synTest =0;
             let synsFloat = [];
             
             let currentObj= objMatch(results[i].value[0].word);
@@ -382,34 +319,14 @@ async function wordParser(str){
             for (let x=0; x<results[i].value.length; x++){
                 
                 for (let n=0; n<results[i].value[x].meanings.length; n++){
-                    // synTest++;
                     synsFloat=synsFloat.concat(results[i].value[x].meanings[n].synonyms);
                 };
                     
-                // console.log(currentObj)
-                // console.log(synsFloat)
+                
                 synsFloat=[...new Set(synsFloat)]
-                // console.log(synsFloat)
                 currentObj.syns=synsFloat;
-                // console.log(currentObj.syns)
-                // if (synsFloat.length<6){
-                //     console.log("less")
-                //     currentObj.syns=synsFloat;
-                // } else {
-                //     console.log("more")
-                //     let synsDump =[];
-                //     while(synsDump.length<5){
-                //         let randSyn = Math.floor(Math.random()*synsFloat.length);
-                //         if (!synsDump.includes(synsFloat[randSyn])){
-                //             synsDump.push(synsFloat[randSyn]);
-                //         };
-                //     };
-                //     currentObj.syns=synsDump;
-                // };
                 
             };
-            // console.log(currentObj)
-            // console.log(currentObj.syns5())
             keywordSluice.push(currentObj);
             
         };
@@ -422,14 +339,12 @@ async function wordParser(str){
             };
         };
     })
-    // console.log("bub")
 
     function createKWObj(word){
         let wordObj={
             primary: word,
             syns: [],
             syns5: function(){
-                // console.log(this.syns)
                 if (this.syns.length<6){
                     return this.syns;
                 } else {
@@ -444,9 +359,6 @@ async function wordParser(str){
                 };
             }
         };
-        // console.log(word)
-        // console.log(wordObj)
-        // console.log(wordObj.syns5())
         return wordObj
     };
 };
@@ -457,13 +369,11 @@ function keywordSifter(){
     })
     
     for (let i=0; i<keywordSluice.length; i++){
-        // console.log(keywordsRaw.includes(keywordSluice[i])+": "+keywordSluice[i])
         if (!primaryArray.includes(keywordSluice[i].primary)){
             keywordsRaw.push(keywordSluice[i]);
             primaryArray = keywordsRaw.map((kwObj)=>{
                 return kwObj.primary;
-            })
-            // console.log(primaryArray)
+            });
         } else {
             keywordsTrash.push(keywordSluice[i]);
         };
@@ -473,20 +383,16 @@ function keywordSifter(){
 };
 
 async function moviesCompiler(){
-    console.log(keywordsRaw)
     // Test Variables
-    let pullCount = 0;
-    let runTime = 0;
-    let isRunning = true
-    timeTest()
+    // let pullCount = 0;
+    // let runTime = 0;
+    // let isRunning = true
+    // timeTest()
     // /Test Variables
 
     let wordSoup = [];
-    // let spentWords = [];
     let movieDump = [];
-    // let movieSluice=[];
     let movieProms=[];
-    // let moviePromsAdv=[];
     let titleWords = [];
     let moviePop=50;
 
@@ -494,14 +400,8 @@ async function moviesCompiler(){
     for (let i=0; i<keywordsRaw.length; i++){
         
         let randoSyns = keywordsRaw[i].syns5();
-        // console.log(randoSyns)
         wordSoup.push(keywordsRaw[i].primary);
         wordSoup = wordSoup.concat(randoSyns);
-        // console.log(wordSoup)
-        // for (let n=0; n<randoSyns.length; n++){
-        //     wordSoup.push(randoSyns[n]);
-        // };
-        // console.log(wordSoup)
     };
     wordSoup=[...new Set(wordSoup)];
     
@@ -516,21 +416,13 @@ async function moviesCompiler(){
             titleWords.push(randoTitle);
         };
     };
-    // console.log("Word Soup:")
-    // console.log(wordSoup)
     const moviesAdd = await moviePusher();
     dumpProcessor();
     localStorage.setItem("moviesMaster", JSON.stringify(movieMatches));
-    console.log(movieMatches)
 
     async function moviePusher(){
         let moviesPending =[];
-        
-        // console.log("Title Words:")
-        // console.log(titleWords);
         const initPulls = await starterPulls(titleWords);
-        // console.log("Initial Promises")
-        // console.log(movieProms)
         const waitProms = await Promise.allSettled(movieProms).then((data)=>{
             data.forEach((pull)=>{
                 
@@ -542,15 +434,10 @@ async function moviesCompiler(){
                             return popValue;
                         } else{
                             return pull.value.total_pages;
-                        }
-                    }
-                    // let rando = Math.ceil(Math.random()*pull.value.total_pages);
+                        };
+                    };
                     let rando = Math.ceil(Math.random()*actualValue());
                     let valueProm = moviePull(titleWord, rando);
-                    // Let's see if I can set an object's property to a promise,
-                    // Then push that object into an array
-                    // Then create a mapped array of only that object's value that is a promise
-                    // then promise all that map array
                     pullObj = {
                         package: valueProm,
                         pullTitle: titleWord,
@@ -568,14 +455,10 @@ async function moviesCompiler(){
             })
             
         });
-        // console.log("Movies Pending (movie objects with promise values):")
-        // console.log(moviesPending)
         if (moviesPending.length>0){
             let pendingProms = moviesPending.map((obj)=>{
                 return obj.package;
             });
-            // console.log("Movie Promises (promises extracted from objects)");
-            // console.log(pendingProms)
             const waitPromsAdv = await Promise.allSettled(pendingProms).then((response)=>{
                 for (let i=0; i<response.length; i++){
                     moviesPending[i].package = response[i];
@@ -583,7 +466,6 @@ async function moviesCompiler(){
                 };
             });
         };
-        // console.log(movieDump)
     };
 
     function dumpProcessor(){
@@ -604,11 +486,10 @@ async function moviesCompiler(){
                 movieObj["titleSplit"]=splitAssign(movie.title);
                 movieObj["oTitleSplit"]=splitAssign(movie.original_title);
                 movieObj["plotSplit"]=splitAssign(movie.overview);
-                // unifiedSplit=movieObj.titleSplit.concat(movieObj.oTitleSplit, movieObj.plotSplit);
                 unifiedSplit=movieObj.titleSplit.concat(movieObj.plotSplit);
                 movieObj["wordSoup"]=[...new Set(unifiedSplit)]
 
-                // console.log(movieObj);
+                
 
                 movieMatches.push(movieObj);
 
@@ -631,32 +512,19 @@ async function moviesCompiler(){
     async function starterPulls(array){
         array.forEach((titleWordVar)=>{
             movieProms.push(moviePull(titleWordVar, 1));
-            // console.log("Let's see if I can read this:")
-            // console.log(moviePull(titleWordVar, 1))
         })
     };
 
     async function moviePull (word, page){
-        // console.log("Pull Check:")
-        // console.log(word)
-        // console.log(page)
         let movieUrl = "https://api.themoviedb.org/3/search/movie?api_key=654175309f8dda54d6e0ea0c7706fa04&include_adult=false&include_video=false&language=en-US&page=1&sort_by=popularity.desc&query="+word+"&page="+page+"&without_genres=99";
-        // console.log(movieUrl)
-        // array.push(fetch(movieUrl).then((response)=>{
         return fetch(movieUrl).then((response)=>{
-            // console.log(response)
-            pullCount++;
+            // pullCount++;
             if (response.status===200){
                 return response.json();
             } else {
                 errorLogs.push(response.status, word, "movie");
             };
         })
-        // .then((data)=>{
-        //     console.log("Title: "+word)
-        //     console.log(data)
-        // })
-        // )
     };
 
     function wordPicker(){
@@ -666,18 +534,18 @@ async function moviesCompiler(){
     
 
     // Time Test Results
-    function timeTest(){
-        let testTimer = setInterval(()=>{
-            runTime++;
-            if (!isRunning){
-                clearInterval(testTimer);
-            };
-        }, 10);
-    };
-    runTime = runTime/100;
-    isRunning = false;
-    console.log(runTime)
-    console.log(pullCount)
+    // function timeTest(){
+    //     let testTimer = setInterval(()=>{
+    //         runTime++;
+    //         if (!isRunning){
+    //             clearInterval(testTimer);
+    //         };
+    //     }, 10);
+    // };
+    // runTime = runTime/100;
+    // isRunning = false;
+    // console.log(runTime)
+    // console.log(pullCount)
 }
 
 function mkwTabulator(){
@@ -685,9 +553,6 @@ function mkwTabulator(){
     let tabMin = 6;
     let mkwMax = 100;
     movieMatches.forEach((movie)=>{
-        // let movieArrays = [movie.titleSplit, movie.oTitleSplit, movie.plotSplit];
-        // movieArrays.forEach((array)=>{mkwDump(array)});
-        // mkwSluice= mkwSluice.concat(movie.wordSoup);
         mkwSluice= mkwSluice.concat(movie.plotSplit);
     });
 
@@ -697,7 +562,6 @@ function mkwTabulator(){
             tab: 0,
         };
         movieMatches.forEach((movie)=>{
-            // if (movie.wordSoup.includes(mkw)){
             if (movie.plotSplit.includes(mkw)){
                 mkwObj.tab++;
             };
@@ -718,7 +582,6 @@ function mkwTabulator(){
                return movieKeywordsFloat[Math.floor(Math.random()*movieKeywordsFloat.length)]
             };
             let mkwRandoOP = mkwRando();
-            // console.log(mkwRandoOP)
             while (movieKeywords.includes(mkwRandoOP)){
                 mkwRandoOP = mkwRando();
             }
@@ -733,11 +596,6 @@ function mkwTabulator(){
     function compareTabs(a,b){
         return a.tab-b.tab;
     }
-    // function mkwDump(array){
-    //     array.forEach((word)=>{
-    //         mkwSluice.push(word);
-    //     });
-    // };
 };
 
 async function scoreTabulator(){
@@ -746,7 +604,6 @@ async function scoreTabulator(){
         keywordsRaw = storedKeywords;
         storedKeywords.forEach((keyword)=>{
             keyword["syns5"]=function(){
-                // console.log(this.syns)
                 if (this.syns.length<6){
                     return this.syns;
                 } else {
@@ -766,15 +623,11 @@ async function scoreTabulator(){
 
     let synsSluice=[];
     let finalists = movieMatches.filter((movie)=>{
-        // console.log(movieMatches)
         let isIncluded = false;
         let onlySelectorWords = mkwSelections.map((item)=>{
             return item.word;
         });
         onlySelectorWords.forEach((word)=>{
-            // console.log(movie.title)
-            // console.log(word)
-            // console.log(movie.wordSoup.includes[word])
             if (movie.wordSoup.includes(word)){
                 isIncluded = true;
             }
@@ -785,13 +638,11 @@ async function scoreTabulator(){
             return false;
         };
     })
-    console.log(finalists)
 
 
     let selectedSluice = mkwSelections.map((mkw)=>{
         return mkw.word
     });
-    console.log(selectedSluice)
     let primarySluice = keywordsRaw.map((wordGroup)=>{
         return wordGroup.primary;
     }).filter((word)=>{
@@ -803,8 +654,6 @@ async function scoreTabulator(){
     });
 
     primarySluice=[...new Set(primarySluice)];
-    // console.log(primarySluice)
-    // keywordsRaw
     storedKeywords.forEach((wordGroup)=>{
         if (wordGroup.syns.length<=5){
             synsSluice=synsSluice.concat(wordGroup.syns)
@@ -847,9 +696,6 @@ async function scoreTabulator(){
             return false;
         };
     });
-    console.log(winners)
-    console.log(winners.length)
-    console.log(winners[Math.floor(Math.random()*winners.length)])
 
     if (winners.length===1){
         winner=winners[0];
@@ -857,75 +703,16 @@ async function scoreTabulator(){
         winner = winners[Math.floor(Math.random()*winners.length)]
     };
 
-    // winnerProm = [];
-
-    // const addOmdbData= await fetch("https://api.themoviedb.org/3/movie/"+winner.id+"/external_ids?api_key=654175309f8dda54d6e0ea0c7706fa04")
-    // .then((response)=>{
-    //     if (response.status===200){
-    //         return response.json()
-    //     } else{
-    //         return "error"
-    //     }
-
-    // }).then((data)=>{
-    //     // fetch("http://www.omdbapi.com/?apikey=1aa15ab1&type=movie&plot=full&i="+data.imdb_id).then((response)=>{
-    //     //     if (response.status===200){
-    //     //         return response.json()
-    //     //     } else{
-    //     //         return "error"
-    //     //     }
-    
-    //     // }).then((data)=>{
-    //     //     winner["omdbData"]=data;
-    //     //     winner["fullPlot"]=data.Plot;
-    //     //     winner["year"]=data.Year;
-    //     //     winner["director"]=data.Director;
-    //     //     winner["cast"]=data.Actors;
-    //     //     // console.log(data.Ratings[1].value)
-    //     //     // winner["rtRating"]=data.Ratings[1].value;
-    //     // });
-    //     winnerProm.push(
-    //         fetch("http://www.omdbapi.com/?apikey=1aa15ab1&type=movie&plot=full&i="+data.imdb_id)
-    //         .then((response)=>{
-    //             if (response.status===200){
-    //                 return response.json()
-    //             } else{
-    //                 return "error"
-    //             };
-    //         }))
-        
-    // });
-    // const waitForWinner = await Promise.allSettled(winnerProm).then((data)=>{
-    //     winner["omdbData"]=data;
-    //     winner["fullPlot"]=data.Plot;
-    //     winner["year"]=data.Year;
-    //     winner["director"]=data.Director;
-    //     winner["cast"]=data.Actors;
-    //         // console.log(data.Ratings[1].value)
-    //         // winner["rtRating"]=data.Ratings[1].value;
-    // })
-    console.log(winner)
-
     localStorage.setItem("winnerMaster", JSON.stringify(winner));
-
-    // console.log(finalists)
     
 
     function arrayChecker(movie, movieArray, keywordArray){
-        // let points = movieArray[1]+keywordArray[1];
         let points = movieArray[1]*keywordArray[1];
         movieArray[0].forEach((movieStr)=>{
             keywordArray[0].forEach((keyword)=>{
                 if (movieStr.includes(keyword)){
                     
                     movie.score+=points;
-                    // console.log("Movie: "+movie.title)
-                    // console.log("Keyword: "+keyword)
-                    // console.log(movieArray[1], keywordArray[1])
-                    // console.log("Points: +"+points)
-                    // console.log("Score: "+movie.score)
-                    // console.log("Sluice")
-                    // console.log(keywordArray)
                 };
             });
         });
@@ -945,17 +732,12 @@ function renderSmiley(){
         let ul = document.createElement("ul");
         ul.setAttribute("class", "mapRow");
         for (let n=0; n<mapTotal[i].length; n++){
-            // let coordinates = [i, n]
             let currentObj = null;
             let li = document.createElement("li");
             
-            // li.dataset.coordinates = i+","+n;
+            
             for (let x=0; x<MapColor.instances.length; x++){
-                // console.log(MapColor.instances[x])
                 for (let y=0; y<MapColor.instances[x].array.length; y++){
-                    // console.log(i)
-                    // console.log(n)
-                    // console.log(MapColor.instances[x].array[y][0], MapColor.instances[x].array[y][1])
                     if (MapColor.instances[x].array[y][0]===i&&MapColor.instances[x].array[y][1]===n){
                         currentObj=MapColor.instances[x];
                     };
@@ -982,7 +764,6 @@ function renderStart(){
     let emptyBox = document.createElement("div");
 
     let limitVal = ()=>{
-        // if (~~randoInput.value>=25&&~~randoInput.value<=1089&&~~randoInput.value!==''){
         if (~~randoInput.value>=25&&~~randoInput.value<=1089){
             return true
         } else {
@@ -1030,7 +811,6 @@ function renderStart(){
     function startStageUp(){
         randoInput.removeEventListener("keydown", numeric);
         emojiNum = randoInput.value;
-        // localStorage.setItem("eNumMaster", JSON.stringify(emojiNum));
         emojiRandomizer(emojiNum);
         stageUpFn();
     };
@@ -1038,10 +818,6 @@ function renderStart(){
 };
 
 function emojiRandomizer(eNum){
-    // let storedENum = JSON.parse(localStorage.getItem("eNumMaster"));
-    // if (storedENum!==null){
-    //     emojiNum = ~~storedENum;
-    // };
     for (let i=0; i<eNum; i++){
         let randoFn=()=>{
             return Math.floor(Math.random()*emojiData.length);
@@ -1144,7 +920,6 @@ function renderEmojis(){
         for (let i=0; i<choiceSlots.length; i++){
             choiceSlots[i].removeEventListener("click", removeEmoji);
         };
-        // const loadTest =  await new Promise(resolve => setTimeout(resolve, 5000));
 
         for (let i=0; i<chosenEmojis.length; i++){
             const wait1 = await wordParser(chosenEmojis[i].name);
@@ -1153,12 +928,8 @@ function renderEmojis(){
             }
             
         };
-        // console.log("bub")
-        // console.log(errorLogs)
-        // console.log(keywordSluice)
+
         keywordSifter();
-        console.log(keywordsRaw)
-        // console.log(keywordsTrash)
         isLoading = false;
         stageUpFn();
     };
@@ -1167,9 +938,6 @@ function renderEmojis(){
         let n=0;
         let emojiRows = [];
         let subUls = [];
-        // Add conditions in case of perfect square, because the +1 in
-        // perfect square would produce overflow
-        // Ref(1)
         let sqr = ()=>{
             let intCheck = Math.sqrt(eligibleEmojis.length)
             if (Number.isInteger(intCheck)){
@@ -1183,7 +951,6 @@ function renderEmojis(){
 
         
         let emojiRowRem = eligibleEmojis.length%sqr();
-        // --(1)
         let emojiRowN = ()=>{
             if (emojiRowRem>0){
                 return ((eligibleEmojis.length-emojiRowRem)/sqr())+1;
@@ -1223,7 +990,6 @@ function renderEmojis(){
                 emojiRows[n].appendChild(subUls[n]);
                 fullUl.appendChild(emojiRows[n]);
             };
-            // p.addEventListener("click", addEmoji, { once:true })
             emojiListener(p);
         };
     };
@@ -1237,9 +1003,6 @@ function renderEmojis(){
         for (let i=0; i<chosenEmojis.length; i++){
             let li = document.createElement("li");
             let p = document.createElement("p");
-            // let emojiMatch = ()=>{
-
-            // };
             p.setAttribute("data-index", chosenEmojis[i].index);
             
             li.setAttribute("class", "emojiBox");
@@ -1267,7 +1030,6 @@ function renderEmojis(){
         };
         chosenEmojis.push(emoji);
         localStorage.setItem("emojisMaster", JSON.stringify(chosenEmojis));
-        // check all children of parent to delete event listeners
         addDropChange();
         renderChoices();
         buttonCheck(button, activeCheck(), emojiButtonFn);
@@ -1348,10 +1110,8 @@ function renderInput(){
     if (storedInput!==null){
         userInputRaw = storedInput;
     };
-    // let charN = 0;
     let inputBox = document.createElement("div");
     let userForm = document.createElement("form");
-    // let question = document.createElement("label");
     let questionDiv = document.createElement("div");
     let qWrapDiv = document.createElement("div");
     let questionEl = document.createElement("h3");
@@ -1361,22 +1121,9 @@ function renderInput(){
     let button = document.createElement("div");
 
     let wordCount = ()=>{
-        // console.log(userInputEl.value)
         if (userInputEl.value!==undefined&&userInputEl.value!==""){
             let countFloat = textSplit(userInputEl.value);
-            return countFloat.length
-            // let floatCount = userInputEl.value.split(/\s/g);
-            // let symbols =["`","~", "!", "@", "#", "$", "%", "^", "&", "*", "(", ")", "-", "_", "=", "+", "[", "]", "{", "}", "|", ",", "<", ">", ".", "/", "?", ";", ":", '"', "'"];
-            // // console.log(floatCount)
-            // floatCount = floatCount.filter((word)=>{
-            //     if (word !== ""&&!symbols.includes(word)){
-            //         return true;
-            //     } else {
-            //         return false;
-            //     }
-            // })
-            // // console.log(floatCount)
-            // return floatCount.length;
+            return countFloat.length;
         } else {
             return 0;
         };
@@ -1396,18 +1143,16 @@ function renderInput(){
     qWrapDiv.setAttribute("class", "qWrapDiv");
     questionEl.setAttribute("class", "h3");
     inputBox.setAttribute("class", "inputBox");
-    // wordMaxEl.setAttribute("class", "wordMaxEl");
     userForm.setAttribute("class", "userForm");
-    // question.setAttribute("class", "question");
+    
     userInputEl.setAttribute("class", "userInputEl");
     button.setAttribute("class", "nextButton");
 
-    // userInputEl.setAttribute("maxLength", "500");
+    
     userInputEl.setAttribute("placeholder", "Ten word minimum...");
     if (userInputRaw.length>0){
         userInputEl.value = userInputRaw;
     };
-    // userInputEl.dataset.wordMax = "250";
     button.setAttribute("style", "align-self: end");
 
     headerTitle.textContent="Time to Type";
@@ -1418,12 +1163,8 @@ function renderInput(){
     } else {
         questionEl.textContent = currentQuestion.question;
     }
-    refresh.textContent="refresh"
+    refresh.textContent="refresh";
 
-
-    // question.textContent = "What kind of movies are you into?"
-    // console.log(wordCount()+"/"+wordMax+" Words")
-    // wordMaxEl.textContent = wordCount()+"/"+wordMax+" Words"
     inputFnMini()
     button.textContent = "NEXT"
 
@@ -1454,7 +1195,6 @@ function renderInput(){
 
     function inputFn(event){
         let key = event.keyCode || event.charCode;
-        // console.log(wordCount())
         if (inputCondition()){
             wordMaxEl.setAttribute("class", "wordMaxEl wcTrue");
             if (wordCount()===wordMax){
@@ -1462,7 +1202,6 @@ function renderInput(){
                     event.preventDefault();
                 };
             };
-            // call buttonChecker/add event listener/buttonfunction
         } else {
             
             if (wordCount()>=wordMax){
@@ -1475,7 +1214,6 @@ function renderInput(){
         };
 
         wordMaxEl.textContent = wordCount()+"/"+wordMax+" Words";
-        // localStorage.setItem("inputMaster", userInputRaw);
         localStorage.setItem("inputMaster", JSON.stringify(userInputEl.value));
         buttonCheck(button, inputCondition(), inputButtonFn);
     };
@@ -1508,17 +1246,12 @@ function renderInput(){
         }
         
 
-        console.log(errorLogs)
-        console.log(keywordSluice)
+        
         keywordSifter();
-        console.log(keywordsRaw)
-        console.log(keywordsTrash)
 
         // Movie Find Function
         const movieWait = await moviesCompiler();
         mkwTabulator();
-        console.log("MKW: ")
-        console.log(movieKeywords);
         isLoading = false;
         stageUpFn();
     };
@@ -1527,12 +1260,10 @@ function renderInput(){
 function renderPicker(){
     let storedMatches = JSON.parse(localStorage.getItem("moviesMaster"));
     if (storedMatches!==null){
-        console.log(storedMatches)
         movieMatches=storedMatches;
     };
     let storedMkwSelections=JSON.parse(localStorage.getItem("selectionsMaster"));
     if (storedMkwSelections!==null){
-        console.log(storedMkwSelections)
         mkwSelections=storedMkwSelections;
     };
     let storedMKW = JSON.parse(localStorage.getItem("mkwMaster"));
@@ -1606,7 +1337,6 @@ function renderPicker(){
             li.textContent = movieKeywords[i].word;
 
             ul.appendChild(li);
-            // Add Eventlisteners
             li.addEventListener("click", mkwSelect);
         };
     };
@@ -1682,33 +1412,15 @@ async function renderMovieCard(){
 
     plotDiv.setAttribute("class", "plotDiv")
 
-    if (winner.posterCheck!=="N/A"){
+    if (winner.posterCheck!==null){
         moviePoster.setAttribute("class", "poster");
     } else {
         moviePoster.setAttribute("class", "nv");
     }
    
     noPoster.setAttribute("class", "noPoster");
-    noPoster.textContent = "Poster Not Found"
-    
-    
-
-    // directorLabel.textContent="Directed by:";
-    // directorText.textContent = winner.director;
-    // castLabel.textContent="Cast:";
-    // castText.textContent=winner.cast;
-
-    // if (winner.fullPlot!==undefined&&winner.fullPlot!=="N/A"){
-    //     plotText.textContent=winner.fullPlot;
-    // } else {
-    //     plotText.textContent=winner.altPlot;
-    // }
+    noPoster.textContent = "Poster Not Found";
     plotText.textContent=winner.altPlot;
-    // if (movie.year!==undefined){
-    //     movieTitle.textContent = winner.title+" ("+winner.year+")";
-    // } else{
-    //     movieTitle.textContent = winner.title+" ("+winner.altYear+")";
-    // };
 
     movieTitle.textContent = winner.title+" ("+winner.altYear+")";
     
@@ -1723,15 +1435,13 @@ async function renderMovieCard(){
     titleDiv.appendChild(movieTitle);
 
     detailsCard.appendChild(titleDiv);
-    // detailsCard.appendChild(directorDiv);
-    // detailsCard.appendChild(castDiv);
 
     plotDiv.appendChild(plotText);
 
     sideCard.appendChild(detailsCard);
     sideCard.appendChild(plotDiv);
 
-    if (winner.posterCheck!=="N/A"){
+    if (winner.posterCheck!==null){
         fullCard.appendChild(moviePoster);
     } else {
         noPoster.appendChild(moviePoster);
@@ -1751,21 +1461,18 @@ function renderLoad(){
             let loadDiv = document.createElement("div");
             let staticDiv = document.createElement("div");
             let p = document.createElement("p");
-            // let span = document.createElement("span");
 
 
             loadDiv.setAttribute("class", "loadDiv");
             staticDiv.setAttribute("class", "staticDiv");
 
-            // p.textContent = "Loading";
-            // span.textContent = ""
+            
             loadText()
             loadTimer()
 
 
             staticDiv.appendChild(p);
             loadDiv.appendChild(staticDiv);
-            // loadDiv.appendChild(span);
             baseCard.appendChild(loadDiv);
 
             function loadTimer(){
@@ -1792,48 +1499,3 @@ function renderLoad(){
         };
     }, 500);
 };
-
-function fetchTMDB() {
-    fetch("https://api.themoviedb.org/3/movie/1491?api_key=654175309f8dda54d6e0ea0c7706fa04&language=en-US")
-      .then((response) => {
-        if (response.status === 200) {
-          return response.json();
-        } else {
-          throw new Error("Failed to fetch data from TMDb");
-        }
-      })
-      .then((data) => {
-        renderTMDB(data); // Call the renderTMDB function with the fetched data
-      })
-      .catch((error) => {
-        console.error(error);
-      });
-  }
-  
-function renderTMDB(movieData) {
-let { title, poster_path, overview } = movieData;
-//this is the base url for all posters... it adds poster_path data to the end and grabs the poster for the movie
-let basePosterURL = 'https://image.tmdb.org/t/p/w500';
-let tmdbContainer = document.createElement('div');
-document.body.appendChild(tmdbContainer); // Append to the document body
-
-tmdbContainer.classList.add('container', 'movie');
-tmdbContainer.innerHTML = `
-    <img src="${basePosterURL + poster_path}" alt="${title}">
-    <div class='movie-title'>
-    <h1>${title}</h1>
-    </div>
-    <div class="overview">
-    <h2>Plot</h2>
-    ${overview}
-    </div>
-`;
-}
-
-
-
-// fetch("https://api.themoviedb.org/3/genre/movie/list?api_key=654175309f8dda54d6e0ea0c7706fa04&language=en-US").then((response)=>{
-//     if (response.status===200){
-//         return response.json()
-//     }
-// }).then((data)=>{console.log(data)})
